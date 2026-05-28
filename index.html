@@ -82,7 +82,7 @@ h1 em{font-style:italic;color:var(--tc)}
 .mcft small{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.18em;color:var(--tc-s);display:block;margin-bottom:3px}
 .mcft .nm{font-family:'Fraunces',serif;font-size:13px;font-weight:500}
 .mcser{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tc-s);font-weight:500}
-.fbadge{position:absolute;top:24px;right:-14px;background:var(--sand);border-radius:2px;padding:9px 13px;font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);box-shadow:0 6px 20px rgba(42,31,23,.12);transform:rotate(5deg);border-left:3px solid var(--tc)}
+.fbadge{position:absolute;top:16px;right:16px;background:var(--sand);border-radius:2px;padding:9px 13px;font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);box-shadow:0 6px 20px rgba(42,31,23,.12);transform:rotate(5deg);border-left:3px solid var(--tc)}
 .fbadge strong{display:block;font-family:'Fraunces',serif;font-size:20px;letter-spacing:-.02em;color:var(--tc);margin-top:2px;text-transform:none}
 
 /* PROBLEMS */
@@ -589,7 +589,7 @@ footer a{color:var(--tc);text-decoration:none}
       <!-- STEP 4: REVIEW -->
       <div class="fstep" id="fs4">
         <h3 class="stitle">Your club, <em>ready.</em></h3>
-        <p class="ssub">Review everything, then submit. We'll reach out within 24 hours to confirm your founding status and book your in-person setup session in Miami.</p>
+        <p class="ssub">Review everything, then submit. Your account and restaurant will be created immediately — you'll be taken directly to your owner dashboard.</p>
 
         <div class="rmc">
           <div class="rb">Rain<span>back</span></div><div class="rt">Founding Member</div>
@@ -629,7 +629,7 @@ footer a{color:var(--tc);text-decoration:none}
         </div>
 
         <div style="background:var(--sand-w);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:18px;font-size:12.5px;color:var(--ink-s);line-height:1.56">
-          By submitting you confirm this is a genuine restaurant application and agree to Rainback's terms. No commitment is made. Applications are reviewed personally by Matteo within 24 hours. Queries: <a href="mailto:miamirainback@gmail.com" style="color:var(--tc)">miamirainback@gmail.com</a>
+          By submitting you confirm this is a genuine restaurant application and agree to Rainback's terms. Queries: <a href="mailto:miamirainback@gmail.com" style="color:var(--tc)">miamirainback@gmail.com</a>
         </div>
 
         <div class="fnav">
@@ -764,6 +764,8 @@ function tpp(el){
 }
 
 // SUBMIT
+const API = 'https://rainback-backend-production.up.railway.app';
+
 async function submit(){
   const g=id=>document.getElementById(id)?.value?.trim()||'';
   const btn=document.getElementById('subbtn');
@@ -774,54 +776,111 @@ async function submit(){
   const cap=document.getElementById('cap')?.value||'200';
   const perks=[...document.querySelectorAll('.pp.on')].map(p=>p.dataset.n).join(' | ');
   const rn=g('restaurant_name'),ci=g('city');
+  const email=g('email');
+  const firstName=g('first_name');
+  const lastName=g('last_name');
+  const password=g('phone')||'Rainback2026!'; // use phone as temp password or default
 
-  const data={
-    restaurant_name:rn,
-    neighborhood:g('neighborhood'),
-    city:ci,
-    cuisine:g('cuisine'),
-    instagram:g('instagram'),
-    address:g('address'),
-    first_name:g('first_name'),
-    last_name:g('last_name'),
-    role:g('role'),
-    email:g('email'),
-    phone:g('phone'),
-    referral:g('referral'),
-    membership_cap:cap,
-    membership_price:g('price'),
-    duration:document.getElementById('dur')?.value||'1 year',
-    perks:perks,
-    custom_perk:g('custperk'),
-    _subject:'🍽️ New Rainback Application — '+rn+', '+ci,
-    _replyto:g('email')
-  };
+  const errEl=document.getElementById('ferr');
 
-  let sent=false;
-
-  // Try Formspree (works with direct email on legacy endpoint)
   try{
-    const r=await fetch('https://formspree.io/miamirainback@gmail.com',{
+    // Step 1: Create owner account
+    const signupRes=await fetch(API+'/api/auth/signup',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify(data)
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password,firstName,lastName,role:'owner'})
     });
-    if(r.ok||r.status===200||r.status===302){sent=true;}
-  }catch(e){}
 
-  // If Formspree didn't work, open mailto as reliable fallback
-  if(!sent){
-    const body=Object.entries(data)
-      .filter(([k])=>!k.startsWith('_'))
-      .map(([k,v])=>`${k.replace(/_/g,' ').toUpperCase()}: ${v||'—'}`)
-      .join('\n\n');
-    const sub=encodeURIComponent(data._subject);
-    const bod=encodeURIComponent(body);
-    // Open in new tab to not navigate away
-    window.open(`mailto:miamirainback@gmail.com?subject=${sub}&body=${bod}`,'_blank');
+    let token,userId;
+    if(signupRes.ok){
+      const signupData=await signupRes.json();
+      token=signupData.token;
+      userId=signupData.user?.id;
+    } else if(signupRes.status===409){
+      // Already registered — log in instead
+      const loginRes=await fetch(API+'/api/auth/login',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email,password})
+      });
+      if(loginRes.ok){
+        const loginData=await loginRes.json();
+        token=loginData.token;
+      } else {
+        // Account exists but wrong password — still proceed to create restaurant
+        const loginData=await loginRes.json().catch(()=>({}));
+        token=null;
+      }
+    }
+
+    if(!token){
+      // Try OTP path — send code to email
+      await fetch(API+'/api/auth/otp/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    }
+
+    // Step 2: Create restaurant (works even without token for now)
+    const restRes=await fetch(API+'/api/restaurants/apply',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        restaurantName:rn,
+        neighborhood:g('neighborhood'),
+        city:ci,
+        cuisine:g('cuisine'),
+        instagram:g('instagram'),
+        address:g('address'),
+        firstName,lastName,
+        role:g('role'),
+        email,
+        phone:g('phone'),
+        referral:g('referral'),
+        membershipCap:cap,
+        membershipPrice:g('price'),
+        duration:document.getElementById('dur')?.value||'1 year',
+        perks,
+        customPerk:g('custperk'),
+      })
+    });
+
+    // Step 3: If we have a token, save it and redirect to owner app
+    if(token){
+      localStorage.setItem('rb_owner_token', token);
+      // Create the restaurant properly now that we are authenticated
+      const createRes=await fetch(API+'/api/restaurants',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({
+          name:rn,
+          neighborhood:g('neighborhood'),
+          city:ci,
+          country:'US',
+          cuisine:g('cuisine'),
+          instagram:g('instagram'),
+          address:g('address'),
+          membershipCap:parseInt(cap)||200,
+          membershipPrice:parseFloat(g('price'))||150,
+          membershipDuration:document.getElementById('dur')?.value||'1 year',
+          tierName:'Founding Member',
+        })
+      });
+      if(createRes.ok){
+        const rest=await createRes.json();
+        localStorage.setItem('rb_restaurant_id', rest.id);
+      }
+      // Redirect to owner dashboard
+      setTimeout(()=>{ window.location.href='/owner'; },800);
+      showSuccess();
+      return;
+    }
+
+    showSuccess();
+  } catch(err){
+    console.error(err);
+    btn.disabled=false;
+    lbl.style.display='block';
+    sp.style.display='none';
+    if(errEl){ errEl.textContent='Something went wrong. Please try again.'; errEl.classList.add('on'); }
   }
-
-  showSuccess();
 }
 
 function showSuccess(){
@@ -853,6 +912,3 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 </script>
 </body>
 </html>
-ENDDOC
-cp /tmp/rainback-preview-v2.html /mnt/user-data/outputs/rainback-landing-v2.html
-echo "done: $(wc -c < /mnt/user-data/outputs/rainback-landing-v2.html) bytes"
