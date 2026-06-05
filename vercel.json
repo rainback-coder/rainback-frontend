@@ -1,8 +1,0 @@
-{
-  "version": 2,
-  "routes": [
-    { "src": "/",        "dest": "/index.html" },
-    { "src": "/member",  "dest": "/member-app.html" },
-    { "src": "/owner",   "dest": "/owner-dashboard.html" }
-  ]
-}
