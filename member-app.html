@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#F2EADC"/>
+<title>Rainback</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --tc:#C5572C;--tc-d:#9E4220;--tc-s:#E8B59A;
+  --olive:#6B7A4F;--olive-s:#A8B084;
+  --sand:#F2EADC;--sand-w:#EAE0CC;--sand-d:#DDD0B6;
+  --ink:#2A1F17;--ink-s:#5C4A3A;--smoke:#8E7D6B;
+  --line:rgba(42,31,23,.10);--line-s:rgba(42,31,23,.18);
+  --aug:#4A2C3A;--aug-s:#7A4A6A;--aug-t:rgba(74,44,58,.08);
+  --ochre:#C89B4F;--ochre-s:#DDB97A;--ochre-t:rgba(200,155,79,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100dvh;min-height:100dvh;overflow:hidden;background:#C0B09A}
+@supports not (height:100dvh){html,body{height:100vh;min-height:100vh}}
+body{font-family:'Inter Tight',sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;padding:16px;-webkit-font-smoothing:antialiased}
+.frame{width:100%;max-width:420px;height:100%;max-height:900px;background:var(--sand);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 30px 80px rgba(42,31,23,.3),0 0 0 8px #1a1410,0 0 0 9px rgba(197,87,44,.2)}
+@media(max-width:480px){body{padding:0}.frame{max-width:100%;max-height:none;height:100dvh;border-radius:0;box-shadow:none}@supports not (height:100dvh){.frame{height:100vh}}}
+.app{height:100%;display:flex;flex-direction:column;background:var(--sand);position:relative}
+.status{height:44px;background:var(--sand);display:flex;justify-content:space-between;align-items:center;padding:0 22px;font-weight:600;font-size:15px;color:var(--ink);flex-shrink:0;z-index:20}
+.screens{flex:1;overflow:hidden;position:relative}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));-webkit-overflow-scrolling:touch}
+.screen.active{display:block;animation:fadeUp .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── OVERLAYS ── */
+.overlay{position:absolute;inset:0;z-index:60;display:none;flex-direction:column}
+.overlay.active{display:flex;animation:slideUp .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.overlay-backdrop{position:fixed;inset:0;background:rgba(42,31,23,.5);z-index:55;display:none}
+.overlay-backdrop.active{display:block}
+
+/* ── NAV ── */
+.nav{position:absolute;bottom:0;left:0;right:0;background:rgba(242,234,220,.94);backdrop-filter:blur(20px);border-top:1px solid var(--line);padding:8px 8px calc(20px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-around;z-index:30}
+.nb{background:none;border:none;cursor:pointer;padding:6px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--smoke);transition:color .2s;flex:1}
+.nb.active{color:var(--tc)}
+.nb svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nb.active svg{stroke-width:2}
+.nl{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.12em;font-weight:500}
+
+/* ── TYPOGRAPHY ── */
+.mono{font-family:'JetBrains Mono',monospace}
+.serif{font-family:'Fraunces',serif}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--smoke)}
+.section-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--smoke);padding:0 22px;margin:20px 0 10px;display:flex;justify-content:space-between;align-items:center}
+.section-lbl .more{color:var(--tc);font-weight:500;cursor:pointer}
+
+/* ── HEADER ── */
+.app-hd{padding:20px 22px 14px;display:flex;justify-content:space-between;align-items:flex-end}
+.screen-ttl{font-family:'Fraunces',serif;font-size:30px;font-weight:400;letter-spacing:-.025em;line-height:1;margin-bottom:3px}
+.screen-ttl em{font-style:italic;color:var(--tc)}
+.screen-sub{font-size:12px;color:var(--smoke)}
+.av{width:40px;height:40px;border-radius:50%;background:var(--tc);color:var(--sand);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:16px;font-weight:500;cursor:pointer;flex-shrink:0}
+
+/* ── MEMBERSHIP CARD ── */
+.card-wrap{padding:0 22px}
+.mcard{background:var(--ink);color:var(--sand);border-radius:18px;padding:20px;position:relative;overflow:hidden;cursor:pointer;transition:transform .25s;background-image:radial-gradient(circle at 88% 0%,rgba(197,87,44,.28),transparent 55%),radial-gradient(circle at 0% 100%,rgba(107,122,79,.15),transparent 60%)}
+.mcard:active{transform:scale(.98)}
+.mcard-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:42px}
+.mcard-brand{font-family:'Fraunces',serif;font-size:13px;font-weight:500}
+.mcard-brand span{color:var(--tc-s)}
+.mcard-tier{font-family:'JetBrains Mono',monospace;font-size:7.5px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc-s);border:1px solid var(--tc-s);padding:4px 7px;border-radius:2px}
+.mcard-tier.founding{color:var(--ochre-s);border-color:var(--ochre-s)}
+.mcard-name{font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.025em;line-height:1;margin-bottom:3px}
+.mcard-name em{font-style:italic;color:var(--tc-s)}
+.mcard-loc{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc-s);margin-bottom:28px}
+.mcard-ft{display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px;border-top:1px solid rgba(232,181,154,.2)}
+.mcard-ft small{font-family:'JetBrains Mono',monospace;font-size:7.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--tc-s);display:block;margin-bottom:3px}
+.mcard-serial{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tc-s);font-weight:500;text-align:right}
+.dots{display:flex;gap:5px;justify-content:center;margin-top:10px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--line-s)}
+.dot.on{background:var(--tc);width:16px;border-radius:3px}
+
+/* ── TAGS ── */
+.perk-row{display:flex;justify-content:space-between;align-items:center;background:var(--sand-w);border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin:0 22px 8px}
+.perk-row>div:first-child{display:flex;flex-direction:column;gap:2px;flex:1}
+.perk-row strong{font-family:'Fraunces',serif;font-size:14px;font-weight:500;color:var(--ink)}
+.perk-row span{font-size:11.5px;color:var(--smoke)}
+.tag{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.14em;padding:4px 8px;border-radius:2px;flex-shrink:0;margin-left:10px}
+.tag-tc{color:var(--tc);background:rgba(197,87,44,.1)}
+.tag-ol{color:var(--olive);background:rgba(107,122,79,.1)}
+.tag-ug{color:var(--tc-d);background:rgba(158,66,32,.1)}
+.tag-oc{color:var(--ochre);background:var(--ochre-t)}
+.tag-au{color:var(--aug-s);background:var(--aug-t)}
+
+/* ── IMPACT TILES ── */
+.impact-grid{padding:0 22px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.itile{background:var(--sand-w);border:1px solid var(--line);border-radius:13px;padding:15px}
+.itile.dark{background:var(--ink);color:var(--sand);grid-column:span 2;background-image:radial-gradient(circle at 85% 0%,rgba(197,87,44,.2),transparent 55%)}
+.itile .lbl{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:6px}
+.itile.dark .lbl{color:var(--tc-s)}
+.itile .val{font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.03em;line-height:1}
+.itile.dark .val{color:var(--tc-s);font-size:32px}
+.itile .sub{font-size:10px;color:var(--smoke);margin-top:4px}
+.itile.dark .sub{color:var(--tc-s);opacity:.85}
+
+/* ── DISCOVER ── */
+.toggle-bar{display:flex;background:var(--sand-w);border-radius:11px;padding:3px;margin:10px 22px;border:1px solid var(--line)}
+.tgl{flex:1;padding:9px;border:none;background:transparent;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;color:var(--smoke);cursor:pointer;border-radius:8px;transition:all .2s}
+.tgl.on{background:var(--ink);color:var(--sand)}
+.chips{display:flex;gap:7px;padding:0 22px 10px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:7px 13px;border-radius:100px;background:var(--sand-w);border:1px solid var(--line);font-size:12px;color:var(--ink);white-space:nowrap;cursor:pointer;transition:all .18s}
+.chip.on{background:var(--tc);color:var(--sand);border-color:var(--tc)}
+
+/* ── MAP ── */
+
+/* ── NYC MAP PINS ── */
+.nyc-map{position:absolute;inset:0;overflow:hidden}
+.svg-pin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;z-index:2;display:flex;flex-direction:column;align-items:center;transition:transform .15s}
+.svg-pin:active{transform:translate(-50%,-100%) scale(1.1)}
+.pin-dot{width:16px;height:16px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid var(--sand);box-shadow:0 2px 6px rgba(42,31,23,.3)}
+.pin-ok .pin-dot{background:var(--olive)}
+.pin-low .pin-dot{background:var(--ochre)}
+.pin-full .pin-dot{background:var(--smoke)}
+.pin-label{font-family:'Inter Tight',sans-serif;font-size:8px;font-weight:600;color:var(--ink);background:rgba(242,234,220,.92);padding:2px 6px;border-radius:6px;margin-top:3px;white-space:nowrap;box-shadow:0 1px 4px rgba(42,31,23,.15);max-width:80px;overflow:hidden;text-overflow:ellipsis}
+#map-container{margin:0 22px 14px;height:380px;border-radius:18px;overflow:hidden;border:1px solid var(--line);position:relative;background:#E8DFC8}
+.svg-map{width:100%;height:100%;display:block}
+.svg-pin{cursor:pointer;transition:all .2s}
+.svg-pin.featured circle:first-child{filter:drop-shadow(0 4px 8px rgba(42,31,23,.4))}
+.map-tip{position:absolute;background:var(--sand);border-radius:8px;padding:10px 12px;box-shadow:0 8px 22px rgba(42,31,23,.18);min-width:180px;display:none;z-index:10;pointer-events:auto}
+.map-tip.on{display:block}
+.map-tip h5{font-family:'Fraunces',serif;font-size:15px;font-weight:500;letter-spacing:-.01em;margin-bottom:2px}
+.map-tip .mt-meta{font-size:10px;color:var(--smoke);margin-bottom:8px}
+.avail-tip{color:var(--olive);font-weight:600}
+.avail-tip.low{color:var(--tc-d)}
+.avail-tip.full{color:var(--smoke)}
+.map-tip button{background:var(--tc);color:var(--sand);border:none;border-radius:100px;padding:8px 14px;font-family:'Inter Tight',sans-serif;font-size:12px;font-weight:500;cursor:pointer;width:100%}
+
+/* ── RESTAURANT CARDS ── */
+.rest-card{background:var(--sand-w);border:1px solid var(--line);border-radius:15px;padding:14px;margin:0 22px 9px;cursor:pointer;display:flex;gap:13px;align-items:center;transition:transform .18s}
+.rest-card:active{transform:scale(.98)}
+.rest-thumb{width:54px;height:54px;border-radius:11px;background:linear-gradient(135deg,var(--tc-s),var(--tc));flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--sand);font-family:'Fraunces',serif;font-size:20px;font-weight:500}
+.rest-thumb.ol{background:linear-gradient(135deg,var(--olive-s),var(--olive))}
+.rest-thumb.dk{background:linear-gradient(135deg,#5C4A3A,var(--ink))}
+.rest-thumb.au{background:linear-gradient(135deg,var(--aug-s),var(--aug))}
+.rest-nm{font-family:'Fraunces',serif;font-size:16px;font-weight:500;letter-spacing:-.015em;margin-bottom:2px}
+.rest-meta{font-size:11px;color:var(--smoke);margin-bottom:5px}
+.avail{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--olive);font-weight:500}
+.avail::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.avail.low{color:var(--tc-d)}
+.avail.full{color:var(--smoke)}
+.rest-dist{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tc);font-weight:500;flex-shrink:0}
+
+/* ── EMPTY STATES ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px;text-align:center}
+.empty-icon{width:64px;height:64px;border-radius:50%;background:var(--sand-w);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:18px}
+.empty-title{font-family:'Fraunces',serif;font-size:22px;font-weight:400;letter-spacing:-.02em;margin-bottom:8px;line-height:1.15}
+.empty-title em{font-style:italic;color:var(--tc)}
+.empty-sub{font-size:13px;color:var(--smoke);line-height:1.55;max-width:260px;margin-bottom:22px}
+.empty-cta{background:var(--ink);color:var(--sand);border:none;border-radius:100px;padding:13px 24px;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:background .2s;text-transform:uppercase;letter-spacing:.05em}
+.empty-cta:active{background:var(--tc)}
+.empty-cta.ghost{background:transparent;color:var(--tc);border:1px solid var(--tc)}
+
+/* ── SKELETON LOADER ── */
+.skeleton{background:linear-gradient(90deg,var(--sand-w) 25%,var(--sand-d) 50%,var(--sand-w) 75%);background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── COLLECTION CARDS (Mine) ── */
+.col-card{background:var(--sand-w);border:1px solid var(--line);border-radius:15px;padding:15px;margin:0 22px 9px;cursor:pointer;transition:transform .18s}
+.col-card:active{transform:scale(.98)}
+.col-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px}
+.col-nm{font-family:'Fraunces',serif;font-size:20px;font-weight:500;letter-spacing:-.02em;margin-bottom:2px}
+.col-loc{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke)}
+.col-ser{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tc);font-weight:500;text-align:right}
+.col-ser small{display:block;font-size:7.5px;color:var(--smoke);text-transform:uppercase;letter-spacing:.15em;margin-bottom:2px}
+.col-stats{display:flex;gap:16px;padding-top:11px;border-top:1px solid var(--line)}
+.col-stat .l{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:2px}
+.col-stat .v{font-family:'Fraunces',serif;font-size:13px;font-weight:500}
+
+/* ── CLUB FEED ── */
+.feed-tabs{display:flex;gap:7px;padding:0 22px 10px;overflow-x:auto;scrollbar-width:none}
+.feed-tabs::-webkit-scrollbar{display:none}
+.ftab{padding:7px 13px;border-radius:100px;background:var(--sand-w);border:1px solid var(--line);font-size:12px;color:var(--smoke);cursor:pointer;white-space:nowrap;font-weight:500}
+.ftab.on{background:var(--ink);color:var(--sand);border-color:var(--ink)}
+
+/* ── VOTE BARS (club feed) ── */
+.vote-opt{position:relative;background:var(--sand-d);border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin-bottom:7px;cursor:pointer;overflow:hidden;transition:border-color .2s}
+.vote-opt:active{border-color:var(--tc)}
+.vote-opt.lead{border-color:var(--olive)}
+.vfill{position:absolute;top:0;left:0;height:100%;background:rgba(197,87,44,.16);border-radius:10px;transition:width .5s ease}
+.vote-opt.lead .vfill{background:rgba(107,122,79,.2)}
+.vc{position:relative;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ink);z-index:1}
+.vc span:last-child{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--tc)}
+.vote-opt.lead .vc span:last-child{color:var(--olive)}
+.feed-item{margin:0 22px 13px;background:var(--sand-w);border:1px solid var(--line);border-radius:15px;padding:16px}
+.feed-src{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.feed-av{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--tc-s),var(--tc));display:flex;align-items:center;justify-content:center;color:var(--sand);font-family:'Fraunces',serif;font-size:13px;font-weight:500}
+.feed-src-nm{font-family:'Fraunces',serif;font-size:13px;font-weight:500;flex:1}
+.feed-src-t{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)}
+.ftype{font-family:'JetBrains Mono',monospace;font-size:7.5px;text-transform:uppercase;letter-spacing:.18em;padding:4px 7px;border-radius:2px}
+.ftype-tc{color:var(--tc);background:rgba(197,87,44,.08)}
+.ftype-ol{color:var(--olive);background:rgba(107,122,79,.1)}
+.ftype-au{color:var(--aug-s);background:var(--aug-t)}
+.feed-ttl{font-family:'Fraunces',serif;font-size:17px;font-weight:500;letter-spacing:-.02em;margin-bottom:6px}
+.feed-body{font-size:12.5px;color:var(--ink-s);line-height:1.5;margin-bottom:12px}
+.rsvp-btn{background:var(--ink);color:var(--sand);border:none;border-radius:100px;padding:10px;font-family:'Inter Tight',sans-serif;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;width:100%;transition:background .2s}
+.rsvp-btn:active{background:var(--tc)}
+
+/* ── NUTRITION ── */
+.ai-badge{display:inline-flex;align-items:center;gap:5px;background:var(--aug-t);border:1px solid var(--aug-s);border-radius:100px;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.15em;color:var(--aug-s);margin:0 22px 14px}
+.nutri-card{background:var(--sand-w);border:1px solid var(--line);border-radius:15px;padding:18px;margin:0 22px 11px}
+.nutri-card h3{font-family:'Fraunces',serif;font-size:18px;font-weight:500;letter-spacing:-.015em;margin-bottom:14px}
+.macro-bars{display:grid;gap:8px;margin-bottom:16px}
+.macro-bar{display:grid;gap:5px}
+.macro-label{display:flex;justify-content:space-between;font-size:11px}
+.macro-label span:first-child{color:var(--smoke)}
+.macro-label span:last-child{font-weight:500}
+.bar-track{height:7px;background:var(--sand-d);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}
+.meal-card{background:var(--sand-w);border:1px solid var(--line);border-radius:15px;padding:16px;margin:0 22px 9px}
+.meal-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.meal-hd h4{font-family:'Fraunces',serif;font-size:15px;font-weight:500;letter-spacing:-.01em}
+.meal-hd span{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)}
+.meal-item{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.meal-item:last-child{border-bottom:none;padding-bottom:0}
+.meal-item .kcal{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--smoke)}
+
+/* ── RESTAURANT DETAIL OVERLAY ── */
+.rest-detail{background:var(--sand);border-radius:28px 28px 0 0;overflow-y:auto;flex:1}
+.rd-hero{height:200px;background:linear-gradient(135deg,#5C4A3A,var(--ink));position:relative;flex-shrink:0}
+.rd-hero-content{position:absolute;inset:0;background:linear-gradient(to top,rgba(42,31,23,.9),transparent);display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+.rd-hero-content h2{font-family:'Fraunces',serif;font-size:32px;font-weight:400;letter-spacing:-.025em;color:var(--sand);margin-bottom:2px}
+.rd-hero-content p{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc-s)}
+.rd-body{padding:22px}
+.rd-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.rd-stat{background:var(--sand-w);border:1px solid var(--line);border-radius:11px;padding:13px;text-align:center}
+.rd-stat .v{font-family:'Fraunces',serif;font-size:20px;font-weight:500;letter-spacing:-.02em}
+.rd-stat .l{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);margin-top:3px}
+.rd-perk-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px}
+.rd-perk-row:last-child{border-bottom:none}
+.rd-perk-row::before{content:'✓';color:var(--olive);font-weight:600;font-size:14px;flex-shrink:0}
+.join-btn{background:var(--tc);color:var(--sand);border:none;border-radius:100px;padding:16px;font-family:'Inter Tight',sans-serif;font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;width:100%;margin-top:20px;transition:background .2s}
+.join-btn:active{background:var(--tc-d)}
+.close-btn{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(42,31,23,.5);border:none;color:var(--sand);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(8px)}
+
+/* ── PURCHASE OVERLAY ── */
+.purchase{background:var(--sand);flex:1;border-radius:28px 28px 0 0;display:flex;flex-direction:column}
+.purchase-hd{padding:22px 22px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px}
+.purchase-hd h3{font-family:'Fraunces',serif;font-size:20px;font-weight:500;flex:1}
+.purchase-body{flex:1;overflow-y:auto;padding:20px 22px}
+.summary-card{background:var(--ink);color:var(--sand);border-radius:14px;padding:18px;margin-bottom:18px;background-image:radial-gradient(circle at 85% 0%,rgba(197,87,44,.25),transparent 55%)}
+.summary-card h4{font-family:'Fraunces',serif;font-size:22px;font-weight:400;margin-bottom:2px}
+.summary-card p{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--tc-s)}
+.summary-price{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px;padding-top:12px;border-top:1px solid rgba(232,181,154,.2)}
+.summary-price .amt{font-family:'Fraunces',serif;font-size:28px;font-weight:400;color:var(--tc-s)}
+.summary-price .note{font-size:10px;opacity:.7;text-align:right}
+.pay-method{background:var(--sand-w);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
+.pay-method.sel{border-color:var(--tc);background:var(--sand)}
+.pay-icon{width:36px;height:24px;background:var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--sand);font-weight:600;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.pay-info{flex:1}
+.pay-info strong{display:block;font-size:13px;font-weight:500;margin-bottom:1px}
+.pay-info span{font-size:11px;color:var(--smoke)}
+.pay-radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line-s);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.pay-method.sel .pay-radio{border-color:var(--tc);background:var(--tc)}
+.pay-method.sel .pay-radio::after{content:'';width:7px;height:7px;background:var(--sand);border-radius:50%}
+.purchase-footer{padding:16px 22px 24px;border-top:1px solid var(--line)}
+.pay-btn{background:var(--tc);color:var(--sand);border:none;border-radius:100px;padding:16px;font-family:'Inter Tight',sans-serif;font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;width:100%;transition:background .2s}
+.pay-btn:active{background:var(--tc-d)}
+.success-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 22px;text-align:center;flex:1}
+.success-tick{width:72px;height:72px;border-radius:50%;background:var(--olive);color:var(--sand);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:20px}
+.success-screen h3{font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.025em;margin-bottom:8px}
+.success-screen h3 em{font-style:italic;color:var(--tc)}
+.success-screen p{font-size:14px;color:var(--smoke);margin-bottom:28px;line-height:1.5}
+.wallet-btn{background:var(--ink);color:var(--sand);border:none;border-radius:100px;padding:14px 28px;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:10px;width:100%}
+.done-btn{background:transparent;color:var(--tc);border:1px solid var(--tc);border-radius:100px;padding:14px 28px;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;cursor:pointer;width:100%}
+
+/* ── ONBOARDING ── */
+.onboard{background:var(--sand);flex:1;display:flex;flex-direction:column;padding:32px 28px 40px}
+.ob-step{display:none;flex-direction:column;flex:1;align-items:center;justify-content:center;text-align:center;animation:fadeUp .3s ease}
+.ob-step.on{display:flex}
+.ob-icon{font-size:64px;margin-bottom:24px}
+.ob-title{font-family:'Fraunces',serif;font-size:32px;font-weight:400;letter-spacing:-.025em;margin-bottom:12px;line-height:1.1}
+.ob-title em{font-style:italic;color:var(--tc)}
+.ob-sub{font-size:15px;color:var(--ink-s);line-height:1.55;max-width:300px;margin-bottom:auto}
+.ob-dots{display:flex;gap:7px;justify-content:center;margin:28px 0 20px}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:var(--line-s);transition:all .25s}
+.ob-dot.on{background:var(--tc);width:22px;border-radius:4px}
+.ob-btn{background:var(--ink);color:var(--sand);border:none;border-radius:100px;padding:16px;font-family:'Inter Tight',sans-serif;font-size:14px;font-weight:500;cursor:pointer;width:100%;transition:background .2s}
+.ob-btn:active{background:var(--tc)}
+.ob-skip{background:none;border:none;color:var(--smoke);font-size:13px;cursor:pointer;padding:12px;font-family:'Inter Tight',sans-serif;margin-top:6px}
+
+/* ── LOGIN SCREEN ── */
+
+.auth-hero{margin-bottom:22px}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border-radius:100px;font-family:'Inter Tight',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;border:1.5px solid var(--ink);transition:transform .1s,box-shadow .2s}
+.social-btn:active{transform:scale(.985)}
+.social-apple{background:var(--ink);color:#fff;border-color:var(--ink)}
+.social-google{background:#fff;color:#3c4043;border-color:var(--line)}
+.social-btn svg{flex-shrink:0}
+.auth-link-btn{background:none;border:none;color:var(--smoke);font-size:13px;font-family:'Inter Tight',sans-serif;cursor:pointer;width:100%;padding:12px;text-decoration:underline;text-underline-offset:2px;margin-top:2px}
+.auth-link-btn:active{color:var(--tc)}
+
+.rb-toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--sand);padding:13px 20px;border-radius:100px;font-size:13px;font-weight:500;box-shadow:0 12px 32px rgba(42,31,23,.35);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:88%;text-align:center}
+.rb-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.rb-toast.err{background:#9E4220}
+.auth-screen{position:absolute;inset:0;background:var(--sand);z-index:70;display:none;flex-direction:column;padding:32px 28px 40px;overflow-y:auto}
+.auth-screen.active{display:flex;animation:fadeUp .3s ease}
+.auth-logo{font-family:'Fraunces',serif;font-size:20px;font-weight:500;color:var(--ink);margin-bottom:6mm}
+.auth-logo span{color:var(--tc)}
+.auth-title{font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.025em;line-height:1.1;margin-bottom:4px}
+.auth-title em{font-style:italic;color:var(--tc)}
+.auth-sub{font-size:13px;color:var(--smoke);margin-bottom:8mm}
+.auth-input{width:100%;padding:14px 16px;background:var(--sand-w);border:1.5px solid var(--line);border-radius:12px;font-family:'Inter Tight',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .2s;margin-bottom:10px}
+.auth-input:focus{border-color:var(--tc);background:var(--sand)}
+.auth-btn{background:var(--ink);color:var(--sand);border:none;border-radius:100px;padding:15px;font-family:'Inter Tight',sans-serif;font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;width:100%;transition:background .2s;margin-top:4px}
+.auth-btn:active{background:var(--tc)}
+.auth-btn.secondary{background:transparent;color:var(--tc);border:1.5px solid var(--tc);margin-top:8px}
+.auth-toggle{text-align:center;margin-top:14px;font-size:13px;color:var(--smoke)}
+.auth-toggle a{color:var(--tc);cursor:pointer;font-weight:500;text-decoration:none}
+.auth-error{background:rgba(197,87,44,.1);border:1px solid rgba(197,87,44,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--tc-d);margin-bottom:10px;display:none}
+.auth-error.show{display:block}
+.auth-name-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--smoke);font-size:12px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line)}
+.otp-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:10px}
+.otp-input{width:44px;height:52px;border:1.5px solid var(--line);border-radius:10px;background:var(--sand-w);text-align:center;font-size:22px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--ink);outline:none;transition:border-color .2s}
+.otp-input:focus{border-color:var(--tc);background:var(--sand)}
+
+</style>
+  <script src="https://js.stripe.com/v3/"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="frame">
+<div class="app">
+<div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+<div class="screens">
+
+<!-- ══ ONBOARDING — keep exactly as v2 ══ -->
+<div class="overlay active" id="ov-onboard" style="z-index:80;background:var(--sand)">
+  <div class="onboard">
+    <div class="ob-step on" id="ob1">
+      <div class="ob-icon">🍽️</div>
+      <h1 class="ob-title">Welcome to <em>Rainback</em></h1>
+      <p class="ob-sub">The private members club for independent restaurants. Join the places you love. Get insider access. Build something real.</p>
+    </div>
+    <div class="ob-step" id="ob2">
+      <div class="ob-icon">🗺️</div>
+      <h1 class="ob-title">Discover your <em>city's clubs</em></h1>
+      <p class="ob-sub">Browse restaurants on the map, see how many memberships are left, and join before they sell out. Scarcity is the point.</p>
+    </div>
+    <div class="ob-step" id="ob3">
+      <div class="ob-icon">💳</div>
+      <h1 class="ob-title">Your card, <em>numbered.</em></h1>
+      <p class="ob-sub">Every member gets a serial number. № 037 of 200. It lives in your wallet, on your phone, and becomes the proof you belong.</p>
+    </div>
+    <div class="ob-dots">
+      <div class="ob-dot on" id="od1"></div>
+      <div class="ob-dot" id="od2"></div>
+      <div class="ob-dot" id="od3"></div>
+    </div>
+    <button class="ob-btn" id="ob-next-btn" onclick="obNext()">Get started →</button>
+    <button class="ob-skip" onclick="showLogin()">I already have an account</button>
+  </div>
+</div>
+
+
+<!-- ══ AUTH SCREEN — Login / Signup / OTP ══ -->
+<div class="rb-toast" id="rb-toast"></div>
+
+<!-- ENTRY QR OVERLAY — member shows this at the restaurant -->
+<div id="qr-overlay" style="display:none;position:fixed;inset:0;background:rgba(42,31,23,.7);z-index:300;align-items:center;justify-content:center;padding:30px">
+  <div style="background:var(--sand);border-radius:24px;padding:30px 26px;max-width:340px;width:100%;text-align:center;position:relative">
+    <button onclick="closeEntryQR()" style="position:absolute;top:16px;right:18px;background:none;border:none;font-size:20px;color:var(--smoke);cursor:pointer">✕</button>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:6px">Show at the door</div>
+    <h3 id="qr-rest" style="font-family:'Fraunces',serif;font-size:22px;font-weight:500;margin-bottom:4px">—</h3>
+    <div id="qr-serial" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tc);margin-bottom:20px">—</div>
+    <div id="qr-box" style="background:#fff;padding:18px;border-radius:16px;display:inline-block;margin-bottom:18px"></div>
+    <p style="font-size:12.5px;color:var(--ink-s);line-height:1.5">Staff scans this to check you in and unlock your perks. Your details stay private — the code only proves your membership.</p>
+  </div>
+</div>
+<div class="auth-screen" id="auth-screen">
+
+  <!-- LOGIN MODE -->
+  <div id="auth-mode-login">
+    <div class="auth-hero">
+      <div class="auth-logo">Rain<span>back</span></div>
+      <h2 class="auth-title">The regulars who<br>love you, <em>made official.</em></h2>
+      <p class="auth-sub">Sign in to see your memberships, perks, and your club feed.</p>
+    </div>
+    <div class="auth-error" id="login-error"></div>
+
+    <!-- Social login -->
+    <button class="social-btn social-apple" onclick="socialLogin('apple')">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.05 12.04c-.03-2.6 2.13-3.85 2.22-3.91-1.21-1.77-3.1-2.01-3.77-2.04-1.6-.16-3.13.94-3.94.94-.81 0-2.07-.92-3.4-.9-1.75.03-3.36 1.02-4.26 2.58-1.82 3.16-.46 7.84 1.3 10.41.86 1.26 1.89 2.67 3.24 2.62 1.3-.05 1.79-.84 3.36-.84s2.01.84 3.39.81c1.4-.02 2.29-1.28 3.15-2.55.99-1.46 1.4-2.87 1.42-2.94-.03-.01-2.73-1.05-2.76-4.16zM14.47 4.5c.72-.87 1.2-2.08 1.07-3.28-1.03.04-2.28.69-3.02 1.56-.66.77-1.24 2-1.08 3.18 1.15.09 2.32-.59 3.03-1.46z"/></svg>
+      Continue with Apple
+    </button>
+    <button class="social-btn social-google" onclick="socialLogin('google')">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-divider">or with email</div>
+
+    <input class="auth-input" id="login-email" type="email" placeholder="Email address" autocomplete="email"/>
+    <input class="auth-input" id="login-password" type="password" placeholder="Password" autocomplete="current-password"/>
+    <button class="auth-btn" onclick="doLogin()">Log in →</button>
+    <button class="auth-link-btn" onclick="switchAuthMode('otp-send')">Email me a code instead</button>
+    <div class="auth-toggle">New to Rainback? <a onclick="switchAuthMode('signup')">Create an account →</a></div>
+  </div>
+
+  <!-- SIGNUP MODE -->
+  <div id="auth-mode-signup" style="display:none">
+    <div class="auth-hero">
+      <div class="auth-logo">Rain<span>back</span></div>
+      <h2 class="auth-title">Join <em>Rainback.</em></h2>
+      <p class="auth-sub">Create your account to start joining the restaurants you love.</p>
+    </div>
+    <div class="auth-error" id="signup-error"></div>
+
+    <button class="social-btn social-apple" onclick="socialLogin('apple')">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.05 12.04c-.03-2.6 2.13-3.85 2.22-3.91-1.21-1.77-3.1-2.01-3.77-2.04-1.6-.16-3.13.94-3.94.94-.81 0-2.07-.92-3.4-.9-1.75.03-3.36 1.02-4.26 2.58-1.82 3.16-.46 7.84 1.3 10.41.86 1.26 1.89 2.67 3.24 2.62 1.3-.05 1.79-.84 3.36-.84s2.01.84 3.39.81c1.4-.02 2.29-1.28 3.15-2.55.99-1.46 1.4-2.87 1.42-2.94-.03-.01-2.73-1.05-2.76-4.16zM14.47 4.5c.72-.87 1.2-2.08 1.07-3.28-1.03.04-2.28.69-3.02 1.56-.66.77-1.24 2-1.08 3.18 1.15.09 2.32-.59 3.03-1.46z"/></svg>
+      Sign up with Apple
+    </button>
+    <button class="social-btn social-google" onclick="socialLogin('google')">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Sign up with Google
+    </button>
+
+    <div class="auth-divider">or with email</div>
+
+    <div class="auth-name-row">
+      <input class="auth-input" id="signup-firstname" type="text" placeholder="First name"/>
+      <input class="auth-input" id="signup-lastname" type="text" placeholder="Last name"/>
+    </div>
+    <input class="auth-input" id="signup-email" type="email" placeholder="Email address"/>
+    <input class="auth-input" id="signup-password" type="password" placeholder="Create a password"/>
+    <label style="display:flex;align-items:flex-start;gap:9px;margin:4px 0 14px;font-size:12px;color:var(--ink-s);line-height:1.45;cursor:pointer">
+      <input type="checkbox" id="signup-consent" style="margin-top:2px;flex-shrink:0;width:16px;height:16px;accent-color:var(--tc)"/>
+      <span>I agree to the <a href="#" onclick="event.preventDefault()" style="color:var(--tc);text-decoration:underline">Terms of Service</a> and <a href="#" onclick="event.preventDefault()" style="color:var(--tc);text-decoration:underline">Privacy Policy</a>.</span>
+    </label>
+    <button class="auth-btn" onclick="doSignup()">Create account →</button>
+    <div class="auth-toggle">Already have an account? <a onclick="switchAuthMode('login')">Log in →</a></div>
+  </div>
+
+  <!-- OTP SEND MODE -->
+  <div id="auth-mode-otp-send" style="display:none">
+    <div class="auth-logo">Rain<span>back</span></div>
+    <h2 class="auth-title">Log in with a <em>code.</em></h2>
+    <p class="auth-sub">We'll send a 6-digit code to your email. No password needed.</p>
+    <div class="auth-error" id="otp-send-error"></div>
+    <input class="auth-input" id="otp-email" type="email" placeholder="Your email address"/>
+    <button class="auth-btn" onclick="doSendOTP()">Send code →</button>
+    <div class="auth-toggle">Back to <a onclick="switchAuthMode('login')">password login →</a></div>
+  </div>
+
+  <!-- OTP VERIFY MODE -->
+  <div id="auth-mode-otp-verify" style="display:none">
+    <div class="auth-logo">Rain<span>back</span></div>
+    <h2 class="auth-title">Enter your <em>code.</em></h2>
+    <p class="auth-sub" id="otp-sent-to">Code sent to your email.</p>
+    <div class="auth-error" id="otp-verify-error"></div>
+    <input class="auth-input" id="otp-code" type="number" placeholder="6-digit code" style="text-align:center;font-size:24px;letter-spacing:8px;font-family:'JetBrains Mono',monospace"/>
+    <input class="auth-input" id="otp-firstname" type="text" placeholder="First name (new accounts only)" style="display:none"/>
+    <input class="auth-input" id="otp-lastname" type="text" placeholder="Last name (new accounts only)" style="display:none"/>
+    <button class="auth-btn" onclick="doVerifyOTP()">Verify &amp; log in →</button>
+    <div class="auth-toggle"><a onclick="switchAuthMode('otp-send')">Resend code →</a></div>
+  </div>
+
+</div>
+
+<!-- ══ RESTAURANT DETAIL OVERLAY — dynamic, populated from API ══ -->
+<div class="overlay-backdrop" id="bd-detail" onclick="closeDetail()"></div>
+<div class="overlay" id="ov-detail" style="top:auto;height:90%;border-radius:28px 28px 0 0">
+  <div class="rest-detail">
+    <div class="rd-hero">
+      <button class="close-btn" onclick="closeDetail()">✕</button>
+      <div class="rd-hero-content">
+        <h2 id="rd-name"></h2>
+        <p id="rd-loc"></p>
+      </div>
+    </div>
+    <div class="rd-body">
+      <div class="rd-stats">
+        <div class="rd-stat"><div class="v" id="rd-left">—</div><div class="l">Left</div></div>
+        <div class="rd-stat"><div class="v" id="rd-price">—</div><div class="l">Price</div></div>
+        <div class="rd-stat"><div class="v" id="rd-dist">—</div><div class="l">Away</div></div>
+      </div>
+      <div class="eyebrow" style="margin-bottom:10px">Member perks</div>
+      <div id="rd-perks">
+        <!-- Populated dynamically from restaurant data -->
+      </div>
+      <button class="join-btn" id="rd-join-btn" onclick="openPurchase()">Join the club →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PURCHASE OVERLAY — structure intact, amounts filled from API ══ -->
+<div class="overlay-backdrop" id="bd-purchase" onclick="closePurchase()"></div>
+<div class="overlay" id="ov-purchase" style="top:auto;height:85%;border-radius:28px 28px 0 0">
+  <div class="purchase" id="purchase-step-1">
+    <div class="purchase-hd">
+      <button style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--smoke)" onclick="closePurchase()">✕</button>
+      <h3>Join <span id="purchase-rest-name"></span></h3>
+    </div>
+    <div class="purchase-body">
+      <div class="summary-card">
+        <h4 id="ps-name"></h4>
+        <p id="ps-loc"></p>
+        <div class="summary-price">
+          <div class="amt" id="ps-price"></div>
+          <div class="note">+ 5% Rainback fee<br>The restaurant keeps your full membership price. The 5% is added on top.</div>
+        </div>
+      </div>
+      <div class="eyebrow" style="margin-bottom:12px">Payment</div>
+
+      <!-- Apple / Google Pay express buttons (Stripe Payment Request) -->
+      <div id="payment-request-button" style="margin-bottom:12px"></div>
+
+      <!-- Real Stripe card field -->
+      <div id="card-element-wrap">
+        <div id="card-element" style="padding:14px 16px;background:var(--sand-w);border:1.5px solid var(--line);border-radius:12px"></div>
+        <div id="card-errors" style="font-size:12px;color:var(--tc-d);margin-top:8px;min-height:16px"></div>
+      </div>
+    </div>
+    <div class="purchase-footer">
+      <button class="pay-btn" id="pay-btn-final" onclick="doPurchase()">Pay →</button>
+      <p style="text-align:center;font-size:11px;color:var(--smoke);margin-top:8px">🔒 Secured by Stripe · Restaurant keeps 100%, you pay 5% on top</p>
+    </div>
+  </div>
+  <div class="purchase" id="purchase-step-2" style="display:none">
+    <div class="success-screen">
+      <div class="success-tick">✓</div>
+      <h3>You're member <em id="success-serial"></em></h3>
+      <p id="success-msg">Your membership is live. Show your card at the door.</p>
+      <button class="wallet-btn" onclick="closePurchase();navigate('mine')">Add to Apple Wallet</button>
+      <button class="done-btn" onclick="closePurchase();navigate('tonight')">View my membership →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TONIGHT
+══════════════════════════════════════════════ -->
+<div class="screen active" id="screen-tonight">
+  <div class="app-hd">
+    <div>
+      <div class="eyebrow" style="margin-bottom:5px" id="tonight-date">—</div>
+      <h1 class="screen-ttl">Good evening, <em id="user-firstname">—</em></h1>
+    </div>
+    <div class="av" id="user-av">—</div>
+  </div>
+
+  <!-- If user has memberships — show card + perks -->
+  <div id="tonight-has-memberships" style="display:none">
+    <div class="section-lbl"><span>Your membership</span><span class="more" onclick="navigate('mine')">All →</span></div>
+    <div class="card-wrap">
+      <div class="mcard" onclick="navigate('mine')">
+        <div class="mcard-hd">
+          <div class="mcard-brand">Rain<span>back</span></div>
+          <div class="mcard-tier founding" id="card-tier">Founding Member</div>
+        </div>
+        <div class="mcard-name"><em id="card-restaurant">—</em></div>
+        <div class="mcard-loc" id="card-location">—</div>
+        <div class="mcard-ft">
+          <div><small>Member since</small><div style="font-family:'Fraunces',serif;font-size:14px;font-weight:500" id="card-name">—</div></div>
+          <div class="mcard-serial" id="card-serial">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-lbl"><span>This week</span></div>
+    <div id="tonight-perks-list">
+      <!-- Populated from API: user's active perks for this week -->
+    </div>
+    <div class="section-lbl"><span>Your season so far</span></div>
+    <div class="impact-grid">
+      <div class="itile"><div class="lbl">Memberships</div><div class="val" id="stat-memberships">—</div><div class="sub">Active</div></div>
+      <div class="itile"><div class="lbl">Perks used</div><div class="val" id="stat-perks">—</div><div class="sub">This season</div></div>
+      <div class="itile dark"><div class="lbl">Next event</div><div class="val" id="stat-next-event">—</div><div class="sub" id="stat-next-event-sub">—</div></div>
+    </div>
+    <div class="section-lbl"><span>New nearby</span><span class="more" onclick="navigate('discover')">Discover →</span></div>
+    <div id="tonight-nearby-list">
+      <!-- Populated from API: nearby restaurants with open memberships -->
+    </div>
+  </div>
+
+  <!-- If no memberships yet — empty state -->
+  <div id="tonight-no-memberships">
+    <div class="empty-state">
+      <div class="empty-icon">🍽️</div>
+      <div class="empty-title">No memberships <em>yet</em></div>
+      <p class="empty-sub">Discover restaurants near you and join your first club. Your membership card will appear here.</p>
+      <button class="empty-cta" onclick="navigate('discover')">Discover restaurants →</button>
+    </div>
+  </div>
+
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     DISCOVER
+══════════════════════════════════════════════ -->
+<div class="screen" id="screen-discover">
+  <div class="app-hd">
+    <div><h1 class="screen-ttl"><em>Discover</em> the club</h1><p class="screen-sub">Independent restaurants near you, taking members.</p></div>
+  </div>
+  <div class="toggle-bar">
+    <button class="tgl on" id="tgl-map" onclick="discoverToggle('map')">Map</button>
+    <button class="tgl" id="tgl-list" onclick="discoverToggle('list')">List</button>
+  </div>
+  <div class="chips">
+    <div class="chip on" onclick="setChip(this)">All</div>
+    <div class="chip" onclick="setChip(this)">Restaurants</div>
+    <div class="chip" onclick="setChip(this)">Cafés</div>
+    <div class="chip" onclick="setChip(this)">Bars</div>
+    <div class="chip" onclick="setChip(this)">Available</div>
+  </div>
+
+  <!-- Map — rendered from real tile layer via API -->
+  <div id="map-container">
+    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:#E8DFC8">
+      <div style="font-size:28px">📍</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--smoke)">Loading map…</div>
+    </div>
+    <div class="map-tip" id="map-tip">
+      <h5 id="mt-name"></h5>
+      <div class="mt-meta">
+        <span id="mt-loc"></span> · <span id="mt-price"></span>
+        <br><span class="avail-tip" id="mt-avail"></span>
+      </div>
+      <button id="mt-btn" onclick="mapTipAction()">View membership →</button>
+    </div>
+  </div>
+
+  <!-- Restaurant list — populated from API -->
+  <div class="section-lbl"><span id="discover-count">Restaurants nearby</span></div>
+  <div id="discover-list">
+    <!-- Empty state while loading -->
+    <div class="empty-state" style="padding:32px">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">Finding restaurants <em>near you</em></div>
+      <p class="empty-sub">Restaurants on Rainback will appear here once they're live in your city.</p>
+    </div>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MINE
+══════════════════════════════════════════════ -->
+<div class="screen" id="screen-mine">
+  <div class="app-hd">
+    <div><h1 class="screen-ttl">My <em>memberships</em></h1><p class="screen-sub" id="mine-sub">—</p></div>
+  </div>
+
+  <!-- Active memberships — populated from API -->
+  <div class="section-lbl"><span>Active</span></div>
+  <div id="mine-active-list">
+    <!-- Empty state -->
+    <div class="empty-state" style="padding:32px">
+      <div class="empty-icon">💳</div>
+      <div class="empty-title">No memberships <em>yet</em></div>
+      <p class="empty-sub">When you join a restaurant, your named card will appear here — numbered, dated, and yours.</p>
+      <button class="empty-cta" onclick="navigate('discover')">Find a restaurant →</button>
+    </div>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CLUB
+══════════════════════════════════════════════ -->
+<div class="screen" id="screen-club">
+  <div class="app-hd">
+    <div><h1 class="screen-ttl">The <em>club</em></h1><p class="screen-sub">From the restaurants you back.</p></div>
+  </div>
+
+  <!-- Tabs — generated from user's memberships -->
+  <div class="feed-tabs" id="club-tabs">
+    <div class="ftab on">All houses</div>
+    <!-- Additional tabs added per membership via JS -->
+  </div>
+
+  <!-- Feed — populated from API -->
+  <div id="club-feed">
+    <div class="empty-state" style="padding:32px">
+      <div class="empty-icon">📣</div>
+      <div class="empty-title">Join a restaurant to see <em>their feed</em></div>
+      <p class="empty-sub">Chef notes, private event invitations, and member votes appear here — once you belong somewhere.</p>
+      <button class="empty-cta" onclick="navigate('discover')">Discover restaurants →</button>
+    </div>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     HEALTH
+══════════════════════════════════════════════ -->
+<div class="screen" id="screen-health">
+  <div class="app-hd">
+    <div><h1 class="screen-ttl"><em>Nutrition</em></h1><p class="screen-sub">From your restaurant visits.</p></div>
+  </div>
+
+  <!-- Summary — populated once visits are tracked -->
+  <div id="health-has-data" style="display:none">
+    <div class="ai-badge">✦ Macronutrients estimated by Rainback AI</div>
+    <div class="nutri-card">
+      <h3>Weekly Summary</h3>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span style="font-size:12px;color:var(--smoke)">Average weekly calories</span>
+        <strong style="font-family:'Fraunces',serif;font-size:24px;font-weight:500" id="health-kcal">— kcal</strong>
+      </div>
+      <div style="font-size:11px;color:var(--smoke);margin-bottom:16px">Based on your restaurant visits</div>
+      <div class="macro-bars" id="health-macro-bars">
+        <!-- Protein, Fat, Carbs bars populated from API -->
+      </div>
+    </div>
+    <div class="section-lbl"><span>Recent meals</span></div>
+    <div id="health-meals-list">
+      <!-- Meal cards populated from visit history -->
+    </div>
+
+    <!-- Apple Health sync -->
+    <div id="health-sync-card" style="margin:0 22px 9px;background:var(--sand-w);border:1px solid var(--line);border-radius:15px;padding:16px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#FF2D55,#FF6B8A);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px">Apple Health</div>
+          <div style="font-size:11px;color:var(--smoke)" id="health-sync-status">Not connected</div>
+        </div>
+        <button class="empty-cta" id="health-sync-btn" style="margin:0;padding:8px 16px;font-size:11px" onclick="connectAppleHealth()">Connect</button>
+      </div>
+      <p style="font-size:11.5px;color:var(--ink-s);line-height:1.5">Sync your dining macros to Apple Health automatically. <strong>Activates when you download the Rainback app</strong> — your meals out will count toward your daily nutrition.</p>
+    </div>
+
+    <div style="margin:0 22px 9px;background:var(--sand-w);border:1px solid var(--line);border-radius:15px;padding:16px">
+      <div class="eyebrow" style="margin-bottom:8px">About AI estimates</div>
+      <p style="font-size:12px;color:var(--ink-s);line-height:1.55">Rainback AI analyses dish names and typical ingredient profiles to estimate macronutrients. These are approximations — for precise information, contact the restaurant directly.</p>
+    </div>
+  </div>
+
+  <!-- Empty state — shown until user has check-in history -->
+  <div id="health-no-data">
+    <div class="empty-state" style="padding:40px 32px">
+      <div class="empty-icon">🥗</div>
+      <div class="empty-title">No visits <em>tracked yet</em></div>
+      <p class="empty-sub">Check in at a Rainback restaurant and we'll estimate the macros from your dishes — automatically, using AI.</p>
+      <button class="empty-cta" onclick="navigate('discover')">Find a restaurant →</button>
+      <button class="empty-cta ghost" style="margin-top:9px;background:transparent" onclick="connectAppleHealth()">Connect Apple Health</button>
+    </div>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+</div><!-- /screens -->
+
+<!-- ══ BOTTOM NAV ══ -->
+<nav class="nav">
+  <button class="nb active" data-s="tonight" onclick="navigate('tonight')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    <span class="nl">Tonight</span>
+  </button>
+  <button class="nb" data-s="discover" onclick="navigate('discover')">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <span class="nl">Discover</span>
+  </button>
+  <button class="nb" data-s="mine" onclick="navigate('mine')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 11h18"/><path d="M7 16h2"/></svg>
+    <span class="nl">Mine</span>
+  </button>
+  <button class="nb" data-s="club" onclick="navigate('club')">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="6" r="2.5"/><path d="M21 16c0-2.5-1.8-4.5-4-4.8"/></svg>
+    <span class="nl">Club</span>
+  </button>
+  <button class="nb" data-s="health" onclick="navigate('health')">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span class="nl">Health</span>
+  </button>
+</nav>
+
+</div><!-- /app -->
+</div><!-- /frame -->
+
+<script>
+// ─────────────────────────────────────────────────
+// RAINBACK MEMBER APP — CONNECTED TO API
+// ─────────────────────────────────────────────────
+
+const API = 'https://rainback-backend-production.up.railway.app';
+
+// ══ STRIPE — replace with your real publishable key (pk_test_... or pk_live_...) ══
+// Get it from: Stripe Dashboard → Developers → API keys
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_REPLACE_WITH_YOUR_KEY';
+let stripe = null, cardElement = null, stripeReady = false;
+function initStripe() {
+  if (stripeReady || typeof Stripe === 'undefined') return;
+  if (STRIPE_PUBLISHABLE_KEY.includes('REPLACE')) {
+    // Key not added yet — show a friendly note instead of an empty box
+    const wrap = document.getElementById('card-element');
+    if (wrap) wrap.innerHTML = '<div style="font-size:12px;color:#8E7D6B;text-align:center;padding:4px">Card payment activates once the Stripe key is added. Tap Pay to join in demo mode.</div>';
+    return;
+  }
+  try {
+    stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+    const elements = stripe.elements();
+    cardElement = elements.create('card', {
+      style: { base: { fontSize: '15px', color: '#2A1F17', fontFamily: 'Inter Tight, sans-serif', '::placeholder': { color: '#8E7D6B' } } }
+    });
+    cardElement.mount('#card-element');
+    cardElement.on('change', e => {
+      document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
+    });
+    stripeReady = true;
+  } catch (err) { console.error('Stripe init:', err); }
+}
+let TOKEN = localStorage.getItem('rb_token') || null;
+let CURRENT_USER = null;
+let CURRENT_RESTAURANT_ID = null; // set when opening detail
+let currentMapTip = null;
+
+// ── API HELPER ──
+let toastTimer = null;
+function showToast(msg, isError) {
+  const t = document.getElementById('rb-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.toggle('err', !!isError);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+      ...opts.headers,
+    },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  if (res.status === 401) { logout(); return null; }
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Request failed'); }
+  return res.json();
+}
+
+// ── AUTH ──
+function saveToken(token, user) {
+  TOKEN = token;
+  CURRENT_USER = user;
+  localStorage.setItem('rb_token', token);
+}
+function logout() {
+  TOKEN = null;
+  CURRENT_USER = null;
+  localStorage.removeItem('rb_token');
+  showLogin();
+}
+
+function showLogin() {
+  // Close onboarding if open
+  const ob = document.getElementById('ov-onboard');
+  if (ob) { ob.style.display = 'none'; }
+  switchAuthMode('login');
+  document.getElementById('auth-screen').classList.add('active');
+}
+
+function hideAuth() {
+  document.getElementById('auth-screen').classList.remove('active');
+}
+
+function showAuthScreen() {
+  showLogin();
+}
+
+function switchAuthMode(mode) {
+  ['login','signup','otp-send','otp-verify'].forEach(m => {
+    const el = document.getElementById('auth-mode-' + m);
+    if (el) el.style.display = m === mode ? 'block' : 'none';
+  });
+  // Clear errors
+  ['login-error','signup-error','otp-send-error','otp-verify-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.classList.remove('show'); }
+  });
+}
+
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+
+// Social login (Apple / Google). The button + flow are ready;
+// the live connection activates once the OAuth keys are added to the backend.
+async function socialLogin(provider) {
+  const url = API + '/api/auth/' + provider;
+  // When OAuth is configured on the backend, this redirects to the provider.
+  // Until then, guide the user to email so they're never stuck.
+  try {
+    const res = await fetch(url, { method: 'GET' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.redirectUrl) { window.location.href = data.redirectUrl; return; }
+    }
+  } catch (e) { /* not configured yet */ }
+  showAuthError('login-error', provider === 'apple'
+    ? 'Apple sign-in is being switched on. For now, use your email below.'
+    : 'Google sign-in is being switched on. For now, use your email below.');
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return showAuthError('login-error', 'Please enter your email and password.');
+  try {
+    const data = await api('/api/auth/login', { method: 'POST', body: { email, password } });
+    if (!data) return;
+    saveToken(data.token, data.user);
+    document.getElementById('user-firstname').textContent = data.user.first_name;
+    document.getElementById('user-av').textContent = data.user.first_name[0];
+    hideAuth();
+    loadTonight();
+  } catch (err) {
+    showAuthError('login-error', err.message === 'Invalid email or password' ? 'Wrong email or password. Try again.' : err.message);
+  }
+}
+
+async function doSignup() {
+  const firstName = document.getElementById('signup-firstname').value.trim();
+  const lastName  = document.getElementById('signup-lastname').value.trim();
+  const email     = document.getElementById('signup-email').value.trim();
+  const password  = document.getElementById('signup-password').value;
+  if (!firstName || !lastName || !email || !password) return showAuthError('signup-error', 'Please fill in all fields.');
+  if (password.length < 6) return showAuthError('signup-error', 'Password must be at least 6 characters.');
+  if (!document.getElementById('signup-consent').checked) return showAuthError('signup-error', 'Please agree to the Terms and Privacy Policy to continue.');
+  try {
+    const data = await api('/api/auth/signup', { method: 'POST', body: { email, password, firstName, lastName } });
+    if (!data) return;
+    saveToken(data.token, data.user);
+    document.getElementById('user-firstname').textContent = data.user.first_name;
+    document.getElementById('user-av').textContent = data.user.first_name[0];
+    hideAuth();
+    loadTonight();
+  } catch (err) {
+    showAuthError('signup-error', err.message.includes('already') ? 'This email is already registered. Log in instead.' : err.message);
+  }
+}
+
+let otpEmailStored = '';
+async function doSendOTP() {
+  const email = document.getElementById('otp-email').value.trim();
+  if (!email) return showAuthError('otp-send-error', 'Please enter your email address.');
+  try {
+    await api('/api/auth/otp/send', { method: 'POST', body: { email } });
+    otpEmailStored = email;
+    document.getElementById('otp-sent-to').textContent = 'Code sent to ' + email;
+    switchAuthMode('otp-verify');
+  } catch (err) {
+    showAuthError('otp-send-error', 'Could not send code. Try again.');
+  }
+}
+
+async function doVerifyOTP() {
+  const code = document.getElementById('otp-code').value.trim();
+  const firstName = document.getElementById('otp-firstname').value.trim();
+  const lastName  = document.getElementById('otp-lastname').value.trim();
+  if (!code) return showAuthError('otp-verify-error', 'Please enter the code.');
+  try {
+    const data = await api('/api/auth/otp/verify', {
+      method: 'POST',
+      body: { email: otpEmailStored, code, firstName: firstName || undefined, lastName: lastName || undefined }
+    });
+    if (data.newUser) {
+      // Show name fields
+      document.getElementById('otp-firstname').style.display = 'block';
+      document.getElementById('otp-lastname').style.display = 'block';
+      return showAuthError('otp-verify-error', 'New account — please enter your name above and verify again.');
+    }
+    if (!data) return;
+    saveToken(data.token, data.user);
+    document.getElementById('user-firstname').textContent = data.user.first_name;
+    document.getElementById('user-av').textContent = data.user.first_name[0];
+    hideAuth();
+    loadTonight();
+  } catch (err) {
+    showAuthError('otp-verify-error', 'Invalid or expired code. Try again.');
+  }
+}
+
+// ── NAV ──
+function navigate(id) {
+  hideTip();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const t = document.getElementById('screen-' + id);
+  if (t) { t.classList.add('active'); t.scrollTop = 0; }
+  const tabs = { tonight:'tonight', discover:'discover', mine:'mine', club:'club', health:'health' };
+  document.querySelectorAll('.nb').forEach(b => b.classList.toggle('active', b.dataset.s === tabs[id]));
+  if (id === 'tonight') loadTonight();
+  if (id === 'discover') loadDiscover();
+  if (id === 'mine') loadMine();
+  if (id === 'club') loadClub();
+  if (id === 'health') loadHealth();
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', async () => {
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const d = new Date();
+  const el = document.getElementById('tonight-date');
+  if (el) el.textContent = days[d.getDay()] + ' ' + d.toLocaleDateString('en-US', { month:'long', day:'numeric' });
+
+  if (TOKEN) {
+    try {
+      const user = await api('/api/auth/me');
+      if (user) {
+        CURRENT_USER = user;
+        document.getElementById('user-firstname').textContent = user.first_name;
+        document.getElementById('user-av').textContent = user.first_name[0];
+        // Close both onboarding and auth if open
+        const ob = document.getElementById('ov-onboard');
+        if (ob) ob.style.display = 'none';
+        hideAuth();
+        loadTonight();
+        return;
+      }
+    } catch {
+      TOKEN = null;
+      localStorage.removeItem('rb_token');
+    }
+  }
+  // No token — show onboarding first (has login option)
+  // Onboarding is already active by default
+});
+
+// ── TONIGHT ──
+async function loadTonight() {
+  if (!TOKEN) return;
+  try {
+    const memberships = await api('/api/memberships/mine');
+    if (!memberships || !memberships.length) {
+      document.getElementById('tonight-has-memberships').style.display = 'none';
+      document.getElementById('tonight-no-memberships').style.display = 'block';
+      return;
+    }
+    const m = memberships[0];
+    document.getElementById('card-restaurant').textContent = m.restaurant_name;
+    document.getElementById('card-location').textContent = m.neighborhood + ', ' + m.city;
+    document.getElementById('card-tier').textContent = m.tier;
+    document.getElementById('card-name').textContent = CURRENT_USER.first_name + ' ' + CURRENT_USER.last_name;
+    document.getElementById('card-serial').textContent = '№ ' + String(m.serial_number).padStart(3,'0') + ' / ' + (m.membership_cap || 200);
+    document.getElementById('stat-memberships').textContent = memberships.length;
+    document.getElementById('tonight-has-memberships').style.display = 'block';
+    document.getElementById('tonight-no-memberships').style.display = 'none';
+
+    // ── THIS WEEK — pull perks + events + votes across all memberships ──
+    const weekItems = [];
+    let totalPerks = 0;
+    const contentByRest = await Promise.all(memberships.map(async mem => {
+      const [events, votes] = await Promise.all([
+        api('/api/events/restaurant/' + mem.restaurant_id).catch(()=>[]),
+        api('/api/votes/restaurant/' + mem.restaurant_id).catch(()=>[]),
+      ]);
+      return { mem, events: events||[], votes: votes||[] };
+    }));
+
+    // Build "This week" list: upcoming events + open votes
+    contentByRest.forEach(c => {
+      (c.events||[]).slice(0,1).forEach(e => {
+        const dt = new Date(e.event_date);
+        weekItems.push({
+          title: e.title,
+          sub: c.mem.restaurant_name + ' · ' + dt.toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+          tag: 'Event', tagClass: 'ol'
+        });
+      });
+      (c.votes||[]).slice(0,1).forEach(v => {
+        weekItems.push({
+          title: v.question,
+          sub: c.mem.restaurant_name + ' · ' + (v.total_votes||0) + ' voted',
+          tag: 'Vote', tagClass: 'tc'
+        });
+      });
+    });
+
+    const perksList = document.getElementById('tonight-perks-list');
+    if (weekItems.length) {
+      perksList.innerHTML = weekItems.slice(0,4).map(p => `
+        <div class="perk-row">
+          <div><strong>${p.title}</strong><span>${p.sub}</span></div>
+          <div class="tag tag-${p.tagClass}">${p.tag}</div>
+        </div>`).join('');
+    } else {
+      perksList.innerHTML = '<div style="padding:6px 22px 14px;color:var(--smoke);font-size:13px">Nothing scheduled this week — check the Club tab for updates.</div>';
+    }
+    document.getElementById('stat-perks').textContent = totalPerks || weekItems.length || '—';
+
+    // ── NEXT EVENT tile ──
+    const allEvents = contentByRest.flatMap(c => (c.events||[]).map(e => ({...e, rest: c.mem.restaurant_name})));
+    allEvents.sort((a,b)=>new Date(a.event_date)-new Date(b.event_date));
+    if (allEvents.length) {
+      const next = allEvents[0];
+      const dt = new Date(next.event_date);
+      document.getElementById('stat-next-event').textContent = dt.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      document.getElementById('stat-next-event-sub').textContent = next.title;
+    } else {
+      document.getElementById('stat-next-event').textContent = '—';
+      document.getElementById('stat-next-event-sub').textContent = 'No events soon';
+    }
+
+    // ── NEW NEARBY — restaurants the member hasn't joined ──
+    try {
+      const allRestaurants = await api('/api/restaurants');
+      const myIds = new Set(memberships.map(m => m.restaurant_id));
+      const nearby = (allRestaurants||[]).filter(r => !myIds.has(r.id)).slice(0,3);
+      const nearbyList = document.getElementById('tonight-nearby-list');
+      if (nearby.length) {
+        nearbyList.innerHTML = nearby.map(r => {
+          const left = parseInt(r.spots_remaining);
+          const availClass = left === 0 ? ' full' : left <= 20 ? ' low' : '';
+          const availText = left === 0 ? 'Sold out' : left + ' of ' + r.membership_cap + ' left';
+          return `<div class="rest-card" onclick="openDetailById('${r.id}','${r.slug}')">
+            <div class="rest-thumb">${r.name[0].toUpperCase()}</div>
+            <div style="flex:1">
+              <div class="rest-nm">${r.name}</div>
+              <div class="rest-meta">${r.neighborhood} · ${r.cuisine||''}</div>
+              <div class="avail${availClass}">${availText}</div>
+            </div>
+            <div class="rest-dist">$${r.membership_price}</div>
+          </div>`;
+        }).join('');
+      } else {
+        nearbyList.innerHTML = '<div style="padding:6px 22px;color:var(--smoke);font-size:13px">You\'ve joined every restaurant in your city. Impressive.</div>';
+      }
+    } catch { /* silent */ }
+  } catch (err) {
+    console.error('loadTonight:', err);
+    const el = document.getElementById('tonight-perks-list');
+    if (el) el.innerHTML = '<div style="padding:20px 22px;color:var(--smoke);font-size:13px;text-align:center">Couldn\'t load right now. <a onclick="loadTonight()" style="color:var(--tc);cursor:pointer">Tap to retry</a></div>';
+  }
+}
+
+// ── DISCOVER ──
+async function loadDiscover() {
+  try {
+    const restaurants = await api('/api/restaurants');
+    if (!restaurants) return;
+    const section = document.getElementById('discover-count');
+    section.textContent = 'Nearby · ' + restaurants.length + ' restaurant' + (restaurants.length !== 1 ? 's' : '');
+    const list = document.getElementById('discover-list');
+    if (!restaurants.length) {
+      list.innerHTML = `<div class="empty-state" style="padding:32px">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">No restaurants <em>yet</em></div>
+        <p class="empty-sub">Rainback is launching in your city soon. Check back shortly.</p>
+      </div>`;
+      return;
+    }
+    list.innerHTML = restaurants.map(r => {
+      const left = parseInt(r.spots_remaining);
+      const initial = r.name[0].toUpperCase();
+      const availClass = left === 0 ? ' full' : left <= 20 ? ' low' : '';
+      const availText = left === 0 ? 'Sold out' : left + ' of ' + r.membership_cap + ' left';
+      return `<div class="rest-card" onclick="openDetailById('${r.id}','${r.slug}')">
+        <div class="rest-thumb">${initial}</div>
+        <div style="flex:1">
+          <div class="rest-nm">${r.name}</div>
+          <div class="rest-meta">${r.neighborhood} · ${r.cuisine || ''}</div>
+          <div class="avail${availClass}">${availText}</div>
+        </div>
+        <div class="rest-dist">$${r.membership_price}</div>
+      </div>`;
+    }).join('');
+    initMap(restaurants);
+  } catch (err) {
+    console.error('loadDiscover:', err);
+    const el = document.getElementById('discover-list');
+    if (el) el.innerHTML = '<div style="padding:20px 22px;color:var(--smoke);font-size:13px;text-align:center">Couldn\'t load restaurants. <a onclick="loadDiscover()" style="color:var(--tc);cursor:pointer">Tap to retry</a></div>';
+  }
+}
+
+// NYC neighborhood → approximate position on our stylized map (% of container)
+// ══ REAL INTERACTIVE MAP (Leaflet + OpenStreetMap) ══
+// Neighborhood → real coordinates, used when a restaurant has no lat/lng of its own.
+const NEIGHBORHOOD_COORDS = {
+  // Miami
+  'South Beach': [25.7846, -80.1300], 'Downtown Miami': [25.7752, -80.1936],
+  'Wynwood': [25.8010, -80.1990], 'Brickell': [25.7617, -80.1918],
+  'Coconut Grove': [25.7280, -80.2436], 'Miami Beach': [25.7907, -80.1300],
+  // New York
+  'West Village': [40.7358, -74.0036], 'Williamsburg': [40.7081, -73.9571],
+  'East Village': [40.7265, -73.9815], 'Upper West Side': [40.7870, -73.9754],
+  'Lower East Side': [40.7180, -73.9880], 'Tribeca': [40.7163, -74.0086],
+  'Murray Hill': [40.7479, -73.9756], 'Astoria': [40.7644, -73.9235],
+  "Hell's Kitchen": [40.7638, -73.9918], 'Upper East Side': [40.7736, -73.9566],
+};
+
+let rbMap = null, rbMarkers = [];
+
+function coordsFor(r) {
+  if (r.latitude && r.longitude) return [parseFloat(r.latitude), parseFloat(r.longitude)];
+  for (const k in NEIGHBORHOOD_COORDS) {
+    if ((r.neighborhood || '').includes(k)) return NEIGHBORHOOD_COORDS[k];
+  }
+  return null;
+}
+
+function initMap(restaurants) {
+  const container = document.getElementById('map-container');
+  if (typeof L === 'undefined') {
+    container.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--smoke);font-size:13px">Map loading…</div>';
+    // Leaflet still downloading from CDN — retry shortly
+    if (!initMap._retries) initMap._retries = 0;
+    if (initMap._retries < 20) {
+      initMap._retries++;
+      setTimeout(() => initMap(restaurants), 300);
+    }
+    return;
+  }
+  initMap._retries = 0;
+
+  // Reset any previous map instance
+  if (rbMap) { rbMap.remove(); rbMap = null; rbMarkers = []; }
+  container.innerHTML = '<div id="leaflet-map" style="width:100%;height:100%"></div>';
+
+  const withCoords = (restaurants || []).map(r => ({ r, c: coordsFor(r) })).filter(x => x.c);
+  // Center on the average of all restaurants, or Miami by default
+  let center = [25.78, -80.19], zoom = 12;
+  if (withCoords.length) {
+    const avgLat = withCoords.reduce((s,x)=>s+x.c[0],0)/withCoords.length;
+    const avgLng = withCoords.reduce((s,x)=>s+x.c[1],0)/withCoords.length;
+    center = [avgLat, avgLng];
+  }
+
+  rbMap = L.map('leaflet-map', { scrollWheelZoom: true, attributionControl: true }).setView(center, zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '© OpenStreetMap'
+  }).addTo(rbMap);
+
+  // Custom pin per restaurant, color-coded by availability
+  withCoords.forEach(({ r, c }) => {
+    const left = parseInt(r.spots_remaining);
+    const sold = left <= 0;
+    const low = left > 0 && left <= 20;
+    const color = sold ? '#8E7D6B' : low ? '#C89B4F' : '#6B7A4F';
+    const icon = L.divIcon({
+      className: 'rb-leaflet-pin',
+      html: `<div style="position:relative;display:flex;flex-direction:column;align-items:center">
+        <div style="width:20px;height:20px;border-radius:50% 50% 50% 0;background:${color};transform:rotate(-45deg);border:2.5px solid #fff;box-shadow:0 2px 8px rgba(42,31,23,.4)"></div>
+        <div style="position:absolute;top:24px;white-space:nowrap;font-size:9px;font-weight:600;color:#2A1F17;background:rgba(242,234,220,.95);padding:2px 7px;border-radius:6px;box-shadow:0 1px 4px rgba(42,31,23,.2)">${r.name}</div>
+      </div>`,
+      iconSize: [20, 20], iconAnchor: [10, 20],
+    });
+    const marker = L.marker(c, { icon }).addTo(rbMap);
+    const availTxt = sold ? 'Sold out' : left + ' of ' + r.membership_cap + ' left';
+    marker.bindPopup(`
+      <div style="font-family:'Inter Tight',sans-serif;min-width:160px">
+        <div style="font-family:Georgia,serif;font-size:15px;font-weight:600;color:#2A1F17;margin-bottom:2px">${r.name}</div>
+        <div style="font-size:11px;color:#8E7D6B;margin-bottom:6px">${r.neighborhood} · ${r.cuisine||''}</div>
+        <div style="font-size:12px;color:${color};font-weight:600;margin-bottom:8px">${availTxt} · $${r.membership_price}</div>
+        <button onclick="openDetailById('${r.id}','${r.slug}')" style="width:100%;background:#2A1F17;color:#F2EADC;border:none;border-radius:100px;padding:8px;font-size:11px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.05em">View membership →</button>
+      </div>`);
+    rbMarkers.push(marker);
+  });
+
+  // Fit all pins in view
+  if (rbMarkers.length > 1) {
+    const group = L.featureGroup(rbMarkers);
+    rbMap.fitBounds(group.getBounds().pad(0.25));
+  } else if (rbMarkers.length === 1) {
+    rbMap.setView(withCoords[0].c, 14);
+  }
+
+  // Leaflet needs a size recalc when shown inside a tab
+  setTimeout(() => { if (rbMap) rbMap.invalidateSize(); }, 250);
+}
+
+// Legacy tooltip helpers kept as no-ops (old SVG pins replaced by Leaflet popups)
+function showTip() {}
+function hideTip() {}
+function mapTipAction() {}
+
+function discoverToggle(mode) {
+  document.getElementById('tgl-map').classList.toggle('on', mode === 'map');
+  document.getElementById('tgl-list').classList.toggle('on', mode === 'list');
+  document.getElementById('map-container').style.display = mode === 'map' ? 'block' : 'none';
+  if (mode === 'map' && rbMap) setTimeout(() => rbMap.invalidateSize(), 100);
+}
+function setChip(el) {
+  document.querySelectorAll('#screen-discover .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ── RESTAURANT DETAIL ──
+async function openDetailById(id, slug) {
+  CURRENT_RESTAURANT_ID = id;
+  document.getElementById('rd-name').textContent = '…';
+  document.getElementById('rd-loc').textContent = '';
+  document.getElementById('rd-left').textContent = '…';
+  document.getElementById('rd-price').textContent = '…';
+  document.getElementById('rd-dist').textContent = '';
+  document.getElementById('rd-perks').innerHTML = '<div style="padding:10px 0;color:var(--smoke);font-size:12px">Loading…</div>';
+  document.getElementById('bd-detail').classList.add('active');
+  document.getElementById('ov-detail').classList.add('active');
+
+  try {
+    const r = await api('/api/restaurants/' + slug);
+    if (!r) return;
+    document.getElementById('rd-name').textContent = r.name;
+    document.getElementById('rd-loc').textContent = (r.neighborhood + ', ' + r.city).toUpperCase();
+    document.getElementById('rd-left').textContent = parseInt(r.spots_remaining) <= 0 ? 'Full' : r.spots_remaining;
+    document.getElementById('rd-price').textContent = '$' + r.membership_price;
+    document.getElementById('rd-join-btn').textContent = 'Join the club → $' + r.membership_price;
+    document.getElementById('rd-perks').innerHTML = (r.perks || []).map(p =>
+      `<div class="rd-perk-row">${p.name} — <span style="color:var(--smoke);font-size:11px">${p.description}</span></div>`
+    ).join('') || '<div style="padding:10px 0;color:var(--smoke);font-size:12px">No perks listed yet.</div>';
+
+    // Pre-fill purchase overlay
+    document.getElementById('purchase-rest-name').textContent = r.name;
+    document.getElementById('ps-name').textContent = r.name;
+    document.getElementById('ps-loc').textContent = r.neighborhood.toUpperCase() + ' · MEMBER';
+    const total = (parseFloat(r.membership_price) * 1.05).toFixed(2);
+    document.getElementById('ps-price').textContent = '$' + r.membership_price;
+    document.getElementById('pay-btn-final').textContent = 'Pay $' + total + ' →';
+  } catch (err) {
+    document.getElementById('rd-name').textContent = 'Error loading';
+    console.error(err);
+  }
+}
+
+// Backwards compat for SVG map pins that call openDetailFor
+async function openDetailFor(name, loc, left, price, dist) {
+  const restaurants = await api('/api/restaurants');
+  const r = restaurants?.find(x => x.name === name);
+  if (r) openDetailById(r.id, r.slug);
+}
+
+function closeDetail() {
+  document.getElementById('bd-detail').classList.remove('active');
+  document.getElementById('ov-detail').classList.remove('active');
+}
+
+// ── PURCHASE ──
+function openPurchase() {
+  if (!TOKEN) { closeDetail(); showToast('Please log in to join');  return; }
+  closeDetail();
+  setTimeout(() => {
+    document.getElementById('bd-purchase').classList.add('active');
+    document.getElementById('ov-purchase').classList.add('active');
+    document.getElementById('purchase-step-1').style.display = 'flex';
+    document.getElementById('purchase-step-2').style.display = 'none';
+    initStripe(); // mount the real card field if Stripe key is set
+  }, 200);
+}
+function closePurchase() {
+  document.getElementById('bd-purchase').classList.remove('active');
+  document.getElementById('ov-purchase').classList.remove('active');
+}
+function selPay(el) {
+  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('sel'));
+  el.classList.add('sel');
+}
+async function doPurchase() {
+  const btn = document.getElementById('pay-btn-final');
+  btn.textContent = 'Processing…';
+  btn.disabled = true;
+  try {
+    let result = null;
+
+    // ── REAL STRIPE PAYMENT (when key configured + restaurant has Stripe) ──
+    if (stripeReady && stripe && cardElement) {
+      let intent = null;
+      try {
+        intent = await api('/api/memberships/intent', {
+          method: 'POST',
+          body: { restaurantId: CURRENT_RESTAURANT_ID },
+        });
+      } catch (e) { intent = null; }
+
+      if (intent && intent.clientSecret) {
+        // Confirm the card payment with Stripe
+        const { error, paymentIntent } = await stripe.confirmCardPayment(intent.clientSecret, {
+          payment_method: { card: cardElement },
+        });
+        if (error) {
+          document.getElementById('card-errors').textContent = error.message;
+          btn.textContent = 'Pay →'; btn.disabled = false;
+          return;
+        }
+        // Payment succeeded — confirm membership server-side
+        result = await api('/api/memberships/purchase', {
+          method: 'POST',
+          body: { restaurantId: CURRENT_RESTAURANT_ID, stripePaymentIntentId: paymentIntent.id },
+        });
+      }
+    }
+
+    // ── DEMO FALLBACK (restaurants without Stripe, or key not set yet) ──
+    if (!result) {
+      result = await api('/api/memberships/demo-purchase', {
+        method: 'POST',
+        body: { restaurantId: CURRENT_RESTAURANT_ID },
+      });
+    }
+    if (!result) throw new Error('Could not complete purchase');
+
+    const serial = '№ ' + String(result.serialNumber).padStart(3,'0') + ' / ' + (result.cap || 200);
+    document.getElementById('success-serial').textContent = serial;
+    document.getElementById('success-msg').textContent = 'Welcome to ' + result.restaurantName + '. Your membership is live.';
+    document.getElementById('purchase-step-1').style.display = 'none';
+    document.getElementById('purchase-step-2').style.display = 'flex';
+  } catch (err) {
+    if (err.message && err.message.includes('already have')) {
+      showToast("You're already a member here");
+    } else {
+      showToast(err.message || 'Payment failed', true);
+    }
+    btn.textContent = 'Pay →';
+    btn.disabled = false;
+  }
+}
+
+// ── MINE ──
+// ── ENTRY QR (member shows at the restaurant) ──
+function showEntryQR(passSerial, restaurantName, serial) {
+  const ov = document.getElementById('qr-overlay');
+  document.getElementById('qr-rest').textContent = restaurantName;
+  document.getElementById('qr-serial').textContent = serial;
+  const box = document.getElementById('qr-box');
+  box.innerHTML = '';
+  if (typeof QRCode !== 'undefined') {
+    new QRCode(box, { text: passSerial, width: 200, height: 200, colorDark: '#2A1F17', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+  } else {
+    box.innerHTML = '<div style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;color:var(--smoke);font-size:12px">QR loading…</div>';
+  }
+  ov.style.display = 'flex';
+}
+function closeEntryQR() {
+  document.getElementById('qr-overlay').style.display = 'none';
+}
+
+async function loadMine() {
+  if (!TOKEN) { document.getElementById('mine-sub').textContent = 'Log in to see your memberships'; return; }
+  document.getElementById('mine-sub').textContent = 'Loading…';
+  try {
+    const memberships = await api('/api/memberships/mine');
+    if (!memberships) return;
+    document.getElementById('mine-sub').textContent = memberships.length + ' active · all in good standing';
+    const list = document.getElementById('mine-active-list');
+    if (!memberships.length) {
+      list.innerHTML = `<div class="empty-state" style="padding:32px">
+        <div class="empty-icon">💳</div>
+        <div class="empty-title">No memberships <em>yet</em></div>
+        <p class="empty-sub">When you join a restaurant, your numbered card appears here.</p>
+        <button class="empty-cta" onclick="navigate('discover')">Find a restaurant →</button>
+      </div>`;
+      return;
+    }
+    list.innerHTML = memberships.map(m => {
+      const serial = '№ ' + String(m.serial_number).padStart(3,'0') + ' / ' + (m.membership_cap || 200);
+      const renews = m.valid_until ? new Date(m.valid_until).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—';
+      return `<div class="col-card">
+        <div class="col-top">
+          <div><div class="col-nm">${m.restaurant_name}</div><div class="col-loc">${m.neighborhood}, ${m.city}</div></div>
+          <div class="col-ser"><small>${m.tier}</small>${serial}</div>
+        </div>
+        <div class="col-stats">
+          <div class="col-stat"><div class="l">Renews</div><div class="v">${renews}</div></div>
+          <div class="col-stat"><div class="l">Visits</div><div class="v">${m.visit_count || 0}</div></div>
+          <div class="col-stat"><div class="l">Status</div><div class="v" style="font-size:13px;color:var(--olive)">Active</div></div>
+        </div>
+        <div style="padding:12px 0 0;display:flex;gap:8px">
+          <button onclick="showEntryQR('${m.pass_serial || m.id}','${(m.restaurant_name||'').replace(/'/g,'')}','${serial}')" style="flex:1;text-align:center;padding:11px;background:var(--ink);color:var(--sand);border:none;border-radius:100px;font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.06em">Show entry QR</button>
+          ${m.pass_url ? `<a href="${m.pass_url}" style="flex:1;text-align:center;padding:11px;background:transparent;color:var(--ink);border:1.5px solid var(--ink);border-radius:100px;font-size:12px;font-weight:600;text-decoration:none;text-transform:uppercase;letter-spacing:.06em">Apple Wallet</a>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch (err) { console.error('loadMine:', err); }
+}
+
+// ── CLUB ──
+async function loadClub() {
+  if (!TOKEN) return;
+  const container = document.getElementById('club-feed');
+  const tabsEl = document.getElementById('club-tabs');
+  try {
+    const memberships = await api('/api/memberships/mine');
+    if (!memberships || !memberships.length) {
+      tabsEl.innerHTML = '<div class="ftab on">All houses</div>';
+      container.innerHTML = `<div class="empty-state" style="padding:32px">
+        <div class="empty-icon">📣</div>
+        <div class="empty-title">Join a restaurant to see <em>their feed</em></div>
+        <p class="empty-sub">Chef notes, events, and votes appear here once you belong somewhere.</p>
+        <button class="empty-cta" onclick="navigate('discover')">Discover restaurants →</button>
+      </div>`;
+      return;
+    }
+
+    tabsEl.innerHTML = '<div class="ftab on">All houses</div>' +
+      memberships.map(m => `<div class="ftab">${m.restaurant_name}</div>`).join('');
+
+    // Load all content in parallel
+    const allContent = await Promise.all(memberships.map(async m => {
+      const [events, notes, votes] = await Promise.all([
+        api('/api/events/restaurant/' + m.restaurant_id).catch(() => []),
+        api('/api/notes/restaurant/' + m.restaurant_id).catch(() => []),
+        api('/api/votes/restaurant/' + m.restaurant_id).catch(() => []),
+      ]);
+      return { restaurant: m.restaurant_name, initial: m.restaurant_name[0], events, notes, votes };
+    }));
+
+    const items = [];
+    allContent.forEach(r => {
+      r.events.forEach(e => items.push({ type:'event', source:r.restaurant, initial:r.initial,
+        ts: new Date(e.event_date), title: e.title, id: e.id,
+        body: e.description || '', rsvpCount: e.rsvp_count || 0, cap: e.capacity || 20,
+        iRsvped: e.i_rsvped }));
+      r.notes.forEach(n => items.push({ type:'note', source:r.restaurant, initial:r.initial,
+        ts: new Date(n.sent_at), title: n.title, body: n.body }));
+      r.votes.forEach(v => items.push({ type:'vote', source:r.restaurant, initial:r.initial,
+        ts: new Date(v.created_at), title: v.question, options: v.options, totalVotes: v.total_votes,
+        closesAt: v.closes_at, voted: v.i_voted, voteId: v.id }));
+    });
+    items.sort((a,b) => b.ts - a.ts);
+
+    if (!items.length) {
+      container.innerHTML = `<div class="empty-state" style="padding:32px">
+        <div class="empty-icon">📣</div>
+        <div class="empty-title">Nothing yet — <em>check back soon</em></div>
+        <p class="empty-sub">Your restaurants will post chef notes, events, and votes here.</p>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = items.map(item => {
+      const timeAgo = formatTimeAgo(item.ts);
+      if (item.type === 'event') return `<div class="feed-item">
+        <div class="feed-src"><div class="feed-av">${item.initial}</div>
+          <div style="flex:1"><div class="feed-src-nm">${item.source}</div><div class="feed-src-t">${timeAgo}</div></div>
+          <div class="ftype ftype-ol">Event</div></div>
+        <div class="feed-ttl">${item.title}</div>
+        <div class="feed-body">${item.body}</div>
+        <button class="rsvp-btn" onclick="rsvpEvent(this,'${item.id}')" ${item.iRsvped?'disabled style="background:var(--olive)"':''}>${item.iRsvped?'Confirmed ✓':'RSVP — '+item.rsvpCount+'/'+item.cap+' seats'}</button>
+      </div>`;
+      if (item.type === 'note') return `<div class="feed-item">
+        <div class="feed-src"><div class="feed-av">${item.initial}</div>
+          <div style="flex:1"><div class="feed-src-nm">${item.source}</div><div class="feed-src-t">${timeAgo}</div></div>
+          <div class="ftype ftype-au">Note</div></div>
+        <div class="feed-ttl">${item.title}</div>
+        <div class="feed-body">${item.body}</div>
+      </div>`;
+      if (item.type === 'vote') {
+        const opts = (item.options || []).map(o => {
+          const pct = item.totalVotes > 0 ? Math.round((o.count / item.totalVotes) * 100) : 0;
+          return `<div class="vote-opt${o.voted?' lead':''}" onclick="castVote('${item.voteId}','${o.id}',this)">
+            <div class="vfill" style="width:${pct}%"></div>
+            <div class="vc"><span>${o.text}</span><span>${pct}%</span></div>
+          </div>`;
+        }).join('');
+        return `<div class="feed-item">
+          <div class="feed-src"><div class="feed-av">${item.initial}</div>
+            <div style="flex:1"><div class="feed-src-nm">${item.source}</div><div class="feed-src-t">${timeAgo}</div></div>
+            <div class="ftype ftype-tc">Vote</div></div>
+          <div class="feed-ttl">${item.title}</div>
+          ${opts}
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:flex;justify-content:space-between">
+            <span>${item.totalVotes} voted</span>
+            ${item.voted ? '<span style="color:var(--olive)">Voted ✓</span>' : '<span style="color:var(--tc)">Open</span>'}
+          </div>
+        </div>`;
+      }
+      return '';
+    }).join('');
+  } catch (err) {
+    console.error('loadClub:', err);
+    const el = document.getElementById('club-feed');
+    if (el) el.innerHTML = '<div style="padding:20px 22px;color:var(--smoke);font-size:13px;text-align:center">Couldn\'t load your feed. <a onclick="loadClub()" style="color:var(--tc);cursor:pointer">Tap to retry</a></div>';
+  }
+}
+
+async function rsvpEvent(btn, eventId) {
+  try {
+    await api('/api/events/' + eventId + '/rsvp', { method: 'POST' });
+    btn.textContent = 'Confirmed ✓';
+    btn.style.background = 'var(--olive)';
+    btn.disabled = true;
+  } catch (err) { showToast(err.message || 'Something went wrong', true); }
+}
+
+async function castVote(voteId, optionId, el) {
+  try {
+    await api('/api/votes/' + voteId + '/respond', { method: 'POST', body: { optionId } });
+    document.querySelectorAll('.vote-opt').forEach(o => o.style.border = '1px solid var(--line)');
+    el.style.border = '1px solid var(--tc)';
+    loadClub(); // Refresh counts
+  } catch (err) { showToast(err.message || 'Something went wrong', true); }
+}
+
+// ── HEALTH ──
+// ── APPLE HEALTH ──
+// In the native app (Capacitor/HealthKit) this requests permission and writes
+// the dining macros to Apple Health. In the web app it detects the bridge;
+// if absent, it guides the user and remembers their choice.
+function isNativeApp() {
+  return !!(window.Capacitor || window.webkit?.messageHandlers?.health);
+}
+async function connectAppleHealth() {
+  const setStatus = (txt, connected) => {
+    const s = document.getElementById('health-sync-status');
+    const b = document.getElementById('health-sync-btn');
+    if (s) s.textContent = txt;
+    if (b && connected) { b.textContent = 'Connected ✓'; b.style.background = 'var(--olive)'; b.disabled = true; }
+  };
+
+  if (isNativeApp()) {
+    // Native bridge present — request HealthKit permission and sync
+    try {
+      const bridge = window.webkit?.messageHandlers?.health;
+      if (bridge) {
+        bridge.postMessage({ action: 'requestAuthorization', types: ['dietaryEnergy','protein','fat','carbs'] });
+        localStorage.setItem('rb_health_connected', '1');
+        setStatus('Connected — syncing meals', true);
+        syncMealsToHealth();
+        return;
+      }
+    } catch (e) { /* fall through */ }
+  }
+
+  // Web app — HealthKit isn't available in a browser (Apple restriction).
+  localStorage.setItem('rb_health_optin', '1');
+  setStatus('Activates in the Rainback app', false);
+  alert("Apple Health sync activates only in the Rainback app.\n\nThis feature works once you download the Rainback app on your iPhone. The app isn't on the App Store yet — when it launches, your dining macros will sync to Apple Health automatically.\n\nIn the meantime, your meals are already tracked here in the app.");
+}
+
+// Collects the member's recent dining macros so the native app can write them to HealthKit.
+async function syncMealsToHealth() {
+  if (!isNativeApp()) return;
+  try {
+    const memberships = await api('/api/memberships/mine');
+    const bridge = window.webkit?.messageHandlers?.health;
+    if (!bridge || !memberships) return;
+    for (const m of memberships) {
+      const dishes = await api('/api/menu/' + m.restaurant_id).catch(() => []);
+      (dishes || []).forEach(d => {
+        bridge.postMessage({ action: 'writeSample', kcal: parseFloat(d.kcal)||0,
+          protein: parseFloat(d.protein_g)||0, fat: parseFloat(d.fat_g)||0, carbs: parseFloat(d.carbs_g)||0,
+          name: d.name, restaurant: m.restaurant_name });
+      });
+    }
+  } catch (e) { console.error('health sync:', e); }
+}
+
+async function loadHealth() {
+  if (!TOKEN) return;
+  try {
+    const memberships = await api('/api/memberships/mine');
+    if (!memberships || !memberships.length) {
+      document.getElementById('health-has-data').style.display = 'none';
+      document.getElementById('health-no-data').style.display = 'block';
+      return;
+    }
+    // Fetch menu dishes for each restaurant to build nutrition data
+    const allDishes = await Promise.all(memberships.map(m =>
+      api('/api/menu/' + m.restaurant_id).then(dishes => ({ restaurant: m.restaurant_name, dishes: dishes || [] }))
+    ));
+    const hasDishes = allDishes.some(r => r.dishes.length > 0);
+    if (!hasDishes) {
+      document.getElementById('health-has-data').style.display = 'none';
+      document.getElementById('health-no-data').style.display = 'block';
+      return;
+    }
+    document.getElementById('health-has-data').style.display = 'block';
+    document.getElementById('health-no-data').style.display = 'none';
+
+    // Restore Apple Health connection status
+    const s = document.getElementById('health-sync-status');
+    const b = document.getElementById('health-sync-btn');
+    if (localStorage.getItem('rb_health_connected') === '1') {
+      if (s) s.textContent = 'Connected — syncing meals';
+      if (b) { b.textContent = 'Connected ✓'; b.style.background = 'var(--olive)'; b.disabled = true; }
+    } else if (localStorage.getItem('rb_health_optin') === '1') {
+      if (s) s.textContent = 'Activates in the Rainback app';
+    }
+
+    // Calculate averages across all dishes — parseFloat because Postgres NUMERIC returns strings
+    const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+    const allCalc = allDishes.flatMap(r => r.dishes).filter(d => num(d.kcal) > 0);
+    const n = allCalc.length || 1;
+    const avgKcal = Math.round(allCalc.reduce((s,d) => s + num(d.kcal), 0) / n);
+    const avgP = Math.round(allCalc.reduce((s,d) => s + num(d.protein_g), 0) / n);
+    const avgF = Math.round(allCalc.reduce((s,d) => s + num(d.fat_g), 0) / n);
+    const avgC = Math.round(allCalc.reduce((s,d) => s + num(d.carbs_g), 0) / n);
+    const total = (avgP + avgF + avgC) || 1;
+
+    document.getElementById('health-kcal').textContent = avgKcal + ' kcal avg';
+    document.getElementById('health-macro-bars').innerHTML = [
+      { label:'Protein', pct: Math.round(avgP/total*100), val: avgP+'g', color:'#7A9BB5' },
+      { label:'Fat',     pct: Math.round(avgF/total*100), val: avgF+'g', color:'#E07070' },
+      { label:'Carbs',   pct: Math.round(avgC/total*100), val: avgC+'g', color:'var(--ochre)' },
+    ].map(m => `<div class="macro-bar">
+      <div class="macro-label"><span>${m.label}</span><span style="color:${m.color}">${m.pct}% · ${m.val}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${m.pct}%;background:${m.color}"></div></div>
+    </div>`).join('');
+
+    document.getElementById('health-meals-list').innerHTML = allDishes.map(r =>
+      r.dishes.length ? `<div class="meal-card">
+        <div class="meal-hd"><h4>${r.restaurant}</h4><span>Menu</span></div>
+        ${r.dishes.slice(0,4).map(d => `<div class="meal-item"><span>${d.name}</span><span class="kcal">${parseFloat(d.kcal)||'—'} kcal</span></div>`).join('')}
+      </div>` : ''
+    ).join('');
+  } catch (err) { console.error('loadHealth:', err); }
+}
+
+// ── HELPERS ──
+function formatTimeAgo(date) {
+  const s = Math.round((Date.now() - date.getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + ' min ago';
+  if (s < 86400) return Math.floor(s/3600) + ' hours ago';
+  return Math.floor(s/86400) + ' days ago';
+}
+
+// ── ONBOARDING / LOGIN ──
+let obStep = 1;
+function obNext() {
+  if (obStep < 3) {
+    document.getElementById('ob' + obStep).classList.remove('on');
+    document.getElementById('od' + obStep).classList.remove('on');
+    obStep++;
+    document.getElementById('ob' + obStep).classList.add('on');
+    document.getElementById('od' + obStep).classList.add('on');
+    if (obStep === 3) document.getElementById('ob-next-btn').textContent = "Let's go →";
+  } else { closeOnboard(); }
+}
+function closeOnboard() {
+  const o = document.getElementById('ov-onboard');
+  o.style.animation = 'none';
+  o.style.transform = 'translateY(-100%)';
+  o.style.opacity = '0';
+  setTimeout(() => o.style.display = 'none', 300);
+}
+</script>
+</body>
+</html>
