@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#F2EADC"/>
+<title>Rainback — A Members Club For The Restaurants You Love</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --tc:#C5572C;--tc-d:#9E4220;--tc-s:#E8B59A;
+  --olive:#6B7A4F;--olive-s:#A8B084;--olive-t:rgba(107,122,79,.09);
+  --sand:#F2EADC;--sand-w:#EAE0CC;--sand-d:#DDD0B6;
+  --ink:#2A1F17;--ink-s:#5C4A3A;--smoke:#8E7D6B;
+  --line:rgba(42,31,23,.1);--line-s:rgba(42,31,23,.18);
+  --aug:#4A2C3A;--aug-s:#7A4A6A;--aug-t:rgba(74,44,58,.08);
+  --ochre:#C89B4F;--ochre-s:#DDB97A;--ochre-t:rgba(200,155,79,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Inter Tight',sans-serif;color:var(--ink);background:var(--sand);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;opacity:.04;pointer-events:none;z-index:1000;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E")}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;padding:16px 36px;display:flex;justify-content:space-between;align-items:center;z-index:100;background:rgba(242,234,220,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+@media(max-width:600px){nav{padding:14px 18px}}
+.logo{font-family:'Fraunces',serif;font-weight:500;font-size:20px;letter-spacing:-.02em}
+.logo span{color:var(--tc)}
+.nav-r{display:flex;gap:26px;align-items:center}
+.nav-r a{font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;color:var(--ink);text-transform:uppercase;letter-spacing:.08em;font-weight:500;transition:color .2s}
+.nav-r a:hover{color:var(--tc)}
+@media(max-width:760px){.nav-r a:not(.ncta){display:none}}
+.ncta{background:var(--ink)!important;color:var(--sand)!important;padding:9px 16px;border-radius:2px}
+.ncta:hover{background:var(--tc)!important}
+
+/* LAYOUT */
+.wrap{max-width:1160px;margin:0 auto;padding:0 36px}
+@media(max-width:600px){.wrap{padding:0 18px}}
+section{padding:96px 0}
+@media(max-width:600px){section{padding:72px 0}}
+
+/* COMMON */
+.ew{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.25em;color:var(--tc);display:flex;align-items:center;gap:11px;margin-bottom:20px}
+.ew::before{content:'';width:26px;height:1px;background:var(--tc)}
+h2.sh{font-family:'Fraunces',serif;font-size:clamp(30px,4vw,52px);font-weight:400;letter-spacing:-.03em;line-height:1.05}
+h2.sh em{font-style:italic;color:var(--tc)}
+.btn{padding:14px 26px;border:none;border-radius:2px;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.bp{background:var(--ink);color:var(--sand)}
+.bp:hover{background:var(--tc);transform:translateY(-1px)}
+.bg{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.bg:hover{background:var(--ink);color:var(--sand)}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.rise{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.r1{animation-delay:.1s}.r2{animation-delay:.25s}.r3{animation-delay:.4s}.r4{animation-delay:.55s}.r5{animation-delay:.7s}
+@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+#hero{min-height:100vh;padding:130px 0 80px;display:flex;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:72px;align-items:center}
+@media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:48px}}
+h1{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(42px,6.5vw,86px);line-height:.97;letter-spacing:-.035em;margin-bottom:24px}
+h1 em{font-style:italic;color:var(--tc)}
+.hsub{font-size:17px;line-height:1.58;color:var(--ink-s);max-width:480px;margin-bottom:32px}
+.hbtns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
+.hstats{display:flex;gap:36px;padding-top:24px;border-top:1px solid var(--line);flex-wrap:wrap}
+.hstat .v{font-family:'Fraunces',serif;font-size:30px;font-weight:400;letter-spacing:-.025em;line-height:1;margin-bottom:4px}
+.hstat .l{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.2em;color:var(--smoke)}
+/* Membership card */
+.cstage{perspective:1300px;position:relative;height:480px;display:flex;align-items:center;justify-content:center}
+@media(max-width:880px){.cstage{height:400px}}
+.mc{width:300px;height:418px;background:var(--ink);color:var(--sand);border-radius:16px;padding:24px;position:relative;overflow:hidden;box-shadow:0 26px 64px rgba(42,31,23,.22);transform:rotate(-4deg) rotateY(-8deg);transition:transform .5s cubic-bezier(.2,.8,.2,1);background-image:radial-gradient(circle at 85% 0%,rgba(197,87,44,.26),transparent 55%),radial-gradient(circle at 0% 100%,rgba(107,122,79,.16),transparent 60%);cursor:pointer}
+.mc:hover{transform:rotate(-2deg) rotateY(-4deg) translateY(-7px)}
+.mchd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:64px}
+.mcbrand{font-family:'Fraunces',serif;font-size:13px;font-weight:500}
+.mcbrand span{color:var(--tc-s)}
+.mctier{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.2em;color:var(--ochre-s);border:1px solid var(--ochre-s);padding:4px 7px;border-radius:2px}
+.mcrn{font-family:'Fraunces',serif;font-size:36px;font-weight:400;letter-spacing:-.025em;line-height:.95;font-style:italic;color:var(--tc-s);margin-bottom:3px}
+.mcl{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc-s);margin-bottom:48px}
+.mcft{display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px;border-top:1px solid rgba(232,181,154,.2)}
+.mcft small{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.18em;color:var(--tc-s);display:block;margin-bottom:3px}
+.mcft .nm{font-family:'Fraunces',serif;font-size:13px;font-weight:500}
+.mcser{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tc-s);font-weight:500}
+.fbadge{position:absolute;top:16px;right:16px;background:var(--sand);border-radius:2px;padding:9px 13px;font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);box-shadow:0 6px 20px rgba(42,31,23,.12);transform:rotate(5deg);border-left:3px solid var(--tc)}
+.fbadge strong{display:block;font-family:'Fraunces',serif;font-size:20px;letter-spacing:-.02em;color:var(--tc);margin-top:2px;text-transform:none}
+
+/* PROBLEMS */
+#problems{background:var(--sand-w);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.phl{font-family:'Fraunces',serif;font-size:clamp(28px,3.8vw,48px);font-weight:400;letter-spacing:-.03em;line-height:1.08;max-width:880px;margin-bottom:46px}
+.phl em{font-style:italic;color:var(--tc)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+@media(max-width:660px){.pgrid{grid-template-columns:1fr}}
+.pcard{background:var(--sand);border:1px solid var(--line);border-radius:4px;padding:32px}
+.pstat{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(64px,9vw,96px);line-height:1;letter-spacing:-.04em;color:var(--tc);margin-bottom:14px}
+.pstat sup{font-size:26px;color:var(--smoke)}
+.ptitle{font-family:'Fraunces',serif;font-size:20px;font-weight:500;letter-spacing:-.02em;margin-bottom:9px}
+.pdesc{font-size:14px;color:var(--ink-s);line-height:1.6}
+.sstrip{background:var(--ink);border-radius:4px;padding:28px 32px;background-image:radial-gradient(circle at 90% 0%,rgba(197,87,44,.18),transparent 50%)}
+.sstrip .sl{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.25em;color:var(--tc-s);margin-bottom:10px}
+.sstrip .st{font-family:'Fraunces',serif;font-weight:400;font-style:italic;font-size:clamp(17px,2.4vw,22px);line-height:1.38;letter-spacing:-.015em;color:var(--sand)}
+.sstrip .st em{font-style:normal;color:var(--tc-s)}
+
+/* HOW */
+#how h2{text-align:center;margin-bottom:64px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
+@media(max-width:760px){.steps{grid-template-columns:1fr;gap:0}}
+.step{padding:0}
+@media(max-width:760px){.step{padding:22px 0;border-bottom:1px solid var(--line)}.step:last-child{border-bottom:none}}
+.snum{font-family:'Fraunces',serif;font-weight:300;font-size:74px;line-height:1;letter-spacing:-.04em;color:var(--ochre);margin-bottom:18px}
+.stitle{font-family:'Fraunces',serif;font-size:24px;font-weight:500;letter-spacing:-.02em;margin-bottom:11px}
+.sdesc{font-size:14.5px;color:var(--ink-s);line-height:1.6;margin-bottom:14px}
+.sdet{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--olive);padding-top:13px;border-top:1px solid var(--line)}
+
+/* FEATURES */
+#features{background:var(--sand-w);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+#features h2{margin-bottom:46px}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:860px){.fgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.fgrid{grid-template-columns:1fr}}
+.feat{background:var(--sand);border:1px solid var(--line);border-radius:4px;padding:26px}
+.fic{width:42px;height:42px;border-radius:50%;background:rgba(197,87,44,.12);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:16px}
+.fic.ol{background:var(--olive-t);border:1px solid var(--olive-s)}
+.fic.au{background:var(--aug-t);border:1px solid var(--aug-s)}
+.fic.oc{background:var(--ochre-t);border:1px solid var(--ochre-s)}
+.ftitle{font-family:'Fraunces',serif;font-size:19px;font-weight:500;letter-spacing:-.015em;margin-bottom:7px}
+.fdesc{font-size:13.5px;color:var(--ink-s);line-height:1.56}
+
+/* DARK PREVIEW */
+#dp{background:var(--ink);color:var(--sand);padding:96px 0}
+.dp-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+@media(max-width:860px){.dp-inner{grid-template-columns:1fr;gap:40px}}
+#dp h2{font-family:'Fraunces',serif;font-size:clamp(28px,3.8vw,48px);font-weight:400;letter-spacing:-.03em;line-height:1.05;margin-bottom:16px}
+#dp h2 em{font-style:italic;color:var(--tc-s)}
+#dp .dsub{font-size:16px;opacity:.8;margin-bottom:28px;line-height:1.6}
+.dpf{display:flex;gap:14px;padding:16px 0;border-top:1px solid rgba(244,239,230,.1)}
+.dpf:last-child{border-bottom:1px solid rgba(244,239,230,.1)}
+.dfic{width:40px;height:40px;border-radius:50%;background:rgba(197,87,44,.16);border:1px solid rgba(197,87,44,.36);color:var(--tc-s);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+.dfic.au{background:var(--aug-t);border-color:var(--aug-s)}
+.dfic.oc{background:var(--ochre-t);border-color:var(--ochre-s)}
+.dfic.ol{background:var(--olive-t);border-color:var(--olive-s)}
+.dft strong{display:block;font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin-bottom:3px}
+.dft span{font-size:13px;opacity:.7}
+/* Phone */
+.pstage{display:flex;justify-content:center}
+.ph{width:265px;height:545px;background:#0a0a09;border-radius:38px;padding:11px;box-shadow:0 36px 90px rgba(0,0,0,.5),0 0 0 1px rgba(197,87,44,.18);transform:rotateY(-10deg) rotateX(3deg);transition:transform .5s}
+.ph:hover{transform:rotateY(-5deg) rotateX(1.5deg)}
+.phs{width:100%;height:100%;background:var(--sand);border-radius:28px;overflow:hidden;position:relative}
+.phn{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:84px;height:22px;background:#0a0a09;border-radius:16px;z-index:5}
+.phc{padding:44px 16px 16px}
+
+/* COMPARISON */
+#comp h2{margin-bottom:42px}
+.ctbl{border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.crow{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--line)}
+.crow:last-child{border-bottom:none}
+.crow.ch{background:var(--sand-d);font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke)}
+.crow.crb{background:var(--ink);color:var(--sand)}
+.crow.crb .cl{color:var(--sand)}
+.cl{padding:15px 18px;font-family:'Fraunces',serif;font-size:15px;font-weight:500;letter-spacing:-.01em}
+.cc{padding:15px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--smoke);border-left:1px solid var(--line)}
+.crow.crb .cc{color:var(--tc-s);border-left-color:rgba(255,255,255,.07)}
+.yes{color:var(--olive)!important;font-weight:700}
+.no{color:var(--tc-d)!important;font-weight:600}
+.crow.crb .yes{color:var(--ochre-s)!important}
+.ctbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:6px}
+.ctbl-wrap::-webkit-scrollbar{height:6px}
+.ctbl-wrap::-webkit-scrollbar-track{background:var(--sand-w)}
+.ctbl-wrap::-webkit-scrollbar-thumb{background:var(--line-s);border-radius:3px}
+@media(max-width:760px){.ctbl{min-width:640px}.cl{font-size:13px;padding:13px 14px}.cc{font-size:10px;padding:13px 8px}.scroll-hint{display:flex}}
+.scroll-hint{display:none;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-top:10px;justify-content:center}
+
+/* FOUNDING OFFER */
+#founding{background:var(--sand-w);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.fo-inner{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+@media(max-width:860px){.fo-inner{grid-template-columns:1fr;gap:36px}}
+.fobadge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc);border:1px solid var(--tc);padding:6px 11px;border-radius:2px;margin-bottom:20px}
+#founding h2{margin-bottom:14px}
+.fosub{font-size:15px;color:var(--ink-s);line-height:1.62;margin-bottom:24px}
+.cities{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.city{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);border:1px solid var(--line);padding:5px 10px;border-radius:2px}
+.city.on{border-color:var(--tc);color:var(--tc)}
+.plist{display:grid;gap:10px;margin-bottom:26px}
+.pb{padding:14px 18px;background:var(--sand);border-left:2px solid var(--tc);border-radius:2px}
+.pb.oc{border-left-color:var(--ochre)}
+.pb.ol{border-left-color:var(--olive)}
+.pb.au{border-left-color:var(--aug-s)}
+.pb strong{display:block;font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin-bottom:2px;letter-spacing:-.01em}
+.pb span{font-size:12.5px;color:var(--smoke)}
+
+/* APPLICATION FORM */
+#apply{scroll-margin-top:74px}
+#apply.bg-alt{background:var(--sand-w)}
+.fc{max-width:660px;margin:0 auto}
+.fhdr{text-align:center;margin-bottom:46px}
+.fhdr h2{margin-bottom:10px}
+.fhdr p{font-size:14px;color:var(--smoke)}
+/* Progress */
+.fprog{display:flex;align-items:center;justify-content:center;margin-bottom:40px}
+.fps{display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;flex:1;max-width:110px}
+.fpc{width:34px;height:34px;border-radius:50%;border:2px solid var(--line-s);background:var(--sand);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:var(--smoke);transition:all .28s;z-index:2}
+.fps.done .fpc{background:var(--olive);border-color:var(--olive);color:var(--sand)}
+.fps.done .fpc .fpc-n{display:none}
+.fps.done .fpc::after{content:'✓';font-size:13px}
+.fps.active .fpc{background:var(--tc);border-color:var(--tc);color:var(--sand)}
+.fpl{font-family:'JetBrains Mono',monospace;font-size:7.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);text-align:center}
+.fps.active .fpl{color:var(--tc)}
+.fps.done .fpl{color:var(--olive)}
+.fline{flex:1;height:2px;background:var(--line-s);max-width:54px;margin-bottom:18px;transition:background .28s}
+.fline.done{background:var(--olive)}
+/* Steps */
+.fstep{display:none}
+.fstep.on{display:block;animation:fi .3s ease}
+.stitle{font-family:'Fraunces',serif;font-size:clamp(22px,3.2vw,34px);font-weight:400;letter-spacing:-.025em;margin-bottom:7px}
+.stitle em{font-style:italic;color:var(--tc)}
+.ssub{font-size:14.5px;color:var(--smoke);margin-bottom:28px;line-height:1.52}
+/* Fields */
+.f{margin-bottom:20px}
+.f label{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);display:block;margin-bottom:7px}
+.f input,.f select,.f textarea{width:100%;padding:13px 16px;background:var(--sand-w);border:1px solid var(--line);border-radius:7px;font-family:'Inter Tight',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .2s;-webkit-appearance:none}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--tc);background:var(--sand)}
+.f textarea{min-height:88px;resize:vertical}
+.f .h{font-size:11.5px;color:var(--smoke);margin-top:5px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:480px){.frow{grid-template-columns:1fr}}
+.f .em{font-size:11px;color:var(--tc-d);margin-top:4px;display:none}
+.f.inv .em{display:block}
+.f.inv input,.f.inv select{border-color:var(--tc-d)}
+/* Slider */
+.sw{background:var(--sand-w);border:1px solid var(--line);border-radius:9px;padding:18px}
+.sv{display:flex;align-items:baseline;gap:7px;margin-bottom:12px}
+.sv strong{font-family:'Fraunces',serif;font-size:48px;font-weight:400;letter-spacing:-.04em;line-height:1;color:var(--tc)}
+.sv span{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke)}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;background:var(--line-s);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;background:var(--tc);border-radius:50%;cursor:pointer;border:3px solid var(--sand);box-shadow:0 2px 6px rgba(197,87,44,.3)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;background:var(--tc);border-radius:50%;cursor:pointer;border:3px solid var(--sand)}
+/* Perk picks */
+.ppgrid{display:grid;gap:8px;margin-bottom:6px}
+.pp{background:var(--sand-w);border:1px solid var(--line);border-radius:9px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .18s;gap:11px}
+.pp.on{background:var(--sand);border-color:var(--tc);box-shadow:0 0 0 1px var(--tc)}
+.pp .ppi strong{display:block;font-family:'Fraunces',serif;font-size:14px;font-weight:500;margin-bottom:2px}
+.pp .ppi span{font-size:11.5px;color:var(--smoke)}
+.ppc{width:25px;height:25px;border-radius:50%;border:1.5px solid var(--line-s);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s;font-size:13px}
+.pp.on .ppc{background:var(--tc);border-color:var(--tc);color:var(--sand)}
+/* Review card */
+.rmc{background:var(--ink);color:var(--sand);border-radius:14px;padding:22px;margin-bottom:20px;background-image:radial-gradient(circle at 85% 0%,rgba(197,87,44,.26),transparent 55%)}
+.rmc .rb{font-family:'Fraunces',serif;font-size:13px;font-weight:500;margin-bottom:2px}
+.rmc .rb span{color:var(--tc-s)}
+.rmc .rt{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.2em;color:var(--ochre-s);border:1px solid var(--ochre-s);padding:3px 7px;border-radius:2px;display:inline-block;margin-bottom:20px}
+.rmc .rn{font-family:'Fraunces',serif;font-size:34px;font-weight:400;letter-spacing:-.03em;line-height:.95;font-style:italic;color:var(--tc-s);margin-bottom:3px}
+.rmc .rl{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc-s);margin-bottom:28px}
+.rmc .rft{display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px;border-top:1px solid rgba(232,181,154,.2)}
+.rmc .rft small{font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.18em;color:var(--tc-s);display:block;margin-bottom:3px}
+.rmc .rser{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tc-s);font-weight:500}
+.rrow{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.rrow:last-child{border-bottom:none}
+.rrow .rl{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke)}
+.rrow .rv{font-size:13.5px;font-weight:500;text-align:right;max-width:65%;word-break:break-word}
+.projbox{background:var(--sand-w);border:1px solid var(--line);border-radius:9px;padding:18px;margin:14px 0}
+.projbox .pl{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:5px}
+.projbox .pv{font-family:'Fraunces',serif;font-size:44px;font-weight:300;letter-spacing:-.04em;line-height:1;color:var(--tc)}
+.projbox .ps{font-size:12px;color:var(--ink-s);margin-top:7px}
+/* Nav */
+.fnav{display:flex;justify-content:space-between;align-items:center;padding-top:26px;margin-top:6px;border-top:1px solid var(--line)}
+.bbk{background:none;border:1px solid var(--line-s);color:var(--smoke);font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;padding:12px 20px;border-radius:2px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;transition:all .2s}
+.bbk:hover{border-color:var(--ink);color:var(--ink)}
+.bnx{background:var(--ink);color:var(--sand);border:none;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;padding:13px 26px;border-radius:2px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;transition:all .2s}
+.bnx:hover{background:var(--tc)}
+.bsub{background:var(--tc);color:var(--sand);border:none;font-family:'Inter Tight',sans-serif;font-size:14px;font-weight:500;padding:15px 32px;border-radius:2px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;transition:all .2s;width:100%;display:flex;align-items:center;justify-content:center;gap:10px}
+.bsub:hover{background:var(--tc-d)}
+.bsub:disabled{opacity:.55;cursor:not-allowed}
+/* Error */
+.ferr{background:rgba(158,66,32,.09);border:1px solid rgba(158,66,32,.28);border-radius:7px;padding:12px 16px;font-size:13px;color:var(--tc-d);margin-bottom:16px;display:none}
+.ferr.on{display:block}
+/* Spinner */
+.spin{width:18px;height:18px;border:2px solid rgba(242,234,220,.35);border-top-color:var(--sand);border-radius:50%;animation:sp .7s linear infinite;display:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* Success */
+.succ{display:none;text-align:center;padding:16px 0}
+.stic{width:74px;height:74px;border-radius:50%;background:var(--olive);color:var(--sand);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 22px}
+.succ h3{font-family:'Fraunces',serif;font-size:34px;font-weight:400;letter-spacing:-.025em;margin-bottom:11px}
+.succ h3 em{font-style:italic;color:var(--tc)}
+.succ p{font-size:15px;color:var(--ink-s);line-height:1.6;max-width:440px;margin:0 auto 28px}
+.sbts{display:flex;flex-direction:column;gap:9px;max-width:300px;margin:0 auto}
+.wn{background:var(--sand-w);border:1px solid var(--line);border-radius:7px;padding:22px;text-align:left;margin-top:26px}
+.wn h4{font-family:'Fraunces',serif;font-size:17px;font-weight:500;margin-bottom:14px}
+.wni{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.45}
+.wni:last-child{border-bottom:none;padding-bottom:0}
+.wni:first-child{padding-top:0}
+.wnn{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tc);font-weight:500;flex-shrink:0;margin-top:1px}
+
+/* FOOTER */
+footer{padding:44px 0;border-top:1px solid var(--line);text-align:center}
+.flogo{font-family:'Fraunces',serif;font-weight:500;font-size:20px;letter-spacing:-.02em;margin-bottom:7px}
+.flogo span{color:var(--tc)}
+.fcities{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.22em;color:var(--smoke);margin-bottom:12px}
+.fcities strong{color:var(--tc)}
+footer p{font-size:12px;color:var(--smoke)}
+footer a{color:var(--tc);text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Rain<span>back</span></div>
+  <div class="nav-r">
+    <a href="#how">How it works</a>
+    <a href="#founding">For restaurants</a>
+    <a href="#apply" class="ncta">Apply free →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="ew rise r1">Members club for independent restaurants</div>
+        <h1 class="rise r2">The regulars<br>who love you,<br><em>made official.</em></h1>
+        <p class="hsub rise r3">Rainback turns your most loyal customers into named, numbered members of your restaurant. Limited supply. Real perks. A community that comes back every week — and pays upfront for the privilege.</p>
+        <div class="hbtns rise r4">
+          <a href="#apply" class="btn bp">Apply as a founding restaurant →</a>
+          <a href="#how" class="btn bg">How it works</a>
+        </div>
+        <div class="hstats rise r5">
+          <div class="hstat"><div class="v">$0</div><div class="l">Cost to restaurant</div></div>
+          <div class="hstat"><div class="v">100%</div><div class="l">Yours to keep</div></div>
+          <div class="hstat"><div class="v">5%</div><div class="l">Paid by member only</div></div>
+        </div>
+      </div>
+      <div class="cstage rise r3">
+        <div class="fbadge">Limited<strong>200 only</strong></div>
+        <div class="mc">
+          <div class="mchd"><div class="mcbrand">Rain<span>back</span></div><div class="mctier">Founding Member</div></div>
+          <div class="mcrn">Doya</div>
+          <div class="mcl">Wynwood — Miami</div>
+          <div class="mcft"><div><small>Member since</small><div class="nm">M. Caprioli</div></div><div class="mcser">№ 037 / 200</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMS -->
+<section id="problems">
+  <div class="wrap">
+    <div class="ew">Why this exists</div>
+    <h2 class="phl">Independent restaurants don't fail because the food is bad. They fail because <em>the loyalty isn't real</em> — and the cash never lasts.</h2>
+    <div class="pgrid">
+      <div class="pcard"><div class="pstat">80<sup>%</sup></div><div class="ptitle">Close within five years.</div><p class="pdesc">Points programs don't build loyalty. Discounts erode margins. Your best regulars love you — but nothing keeps them when the next hot opening lands across the street.</p></div>
+      <div class="pcard"><div class="pstat">90<sup>d</sup></div><div class="ptitle">The runway between rent and a bad week.</div><p class="pdesc">Banks won't lend without collateral. Investors want equity. GoFundMe feels desperate. Your community wants to back you. There's never been a mechanism to let them.</p></div>
+    </div>
+    <div class="sstrip"><div class="sl">What Rainback does</div><div class="st">We turn your most loyal customers into <em>named, numbered members</em> of your restaurant — with real perks, real status, and real cash that arrives the day they join.</div></div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="wrap">
+    <div class="ew">Three steps. One afternoon.</div>
+    <h2 class="sh" style="text-align:center;margin-bottom:60px">Open a <em>private members club</em> at your restaurant.</h2>
+    <div class="steps">
+      <div class="step"><div class="snum">01</div><div class="stitle">You set the terms.</div><p class="sdesc">Choose how many memberships exist — 200 is typical. Set the price. Choose the perks: priority tables, chef nights, early menu access, a vote on the next dish.</p><div class="sdet">→ Setup takes 15 minutes</div></div>
+      <div class="step"><div class="snum">02</div><div class="stitle">Your regulars join.</div><p class="sdesc">They get a numbered, named membership — on their phone, in their wallet, and on a printed card you hand them. № 037 of 200 means something. You get paid the same day, 100% to you.</p><div class="sdet">→ 100% direct to you, same day</div></div>
+      <div class="step"><div class="snum">03</div><div class="stitle">They come back. Often.</div><p class="sdesc">A member walks in. Your team sees their name and tier. They get the priority table, the perk that makes them feel seen. They stay one year. They renew. They tell their friends.</p><div class="sdet">→ Retention you can measure</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="wrap">
+    <div class="ew">Everything in the platform</div>
+    <h2 class="sh" style="margin-bottom:42px">Designed like the menus they read,<br><em>not the apps they delete.</em></h2>
+    <div class="fgrid">
+      <div class="feat"><div class="fic">⌗</div><div class="ftitle">Numbered membership</div><p class="fdesc">Every member gets a serial. № 037 of 200. It appears on their card, wallet pass, and in the app. Scarcity built into the identity.</p></div>
+      <div class="feat"><div class="fic ol">⤳</div><div class="ftitle">Priority access</div><p class="fdesc">Tables held for members. Chef nights members-only. Early menus before the public. Real access, not points that expire.</p></div>
+      <div class="feat"><div class="fic au">∴</div><div class="ftitle">Voting & community</div><p class="fdesc">Monthly polls on next dish, wine list, event themes. Members shape the restaurant. They stay invested because they're actually involved.</p></div>
+      <div class="feat"><div class="fic oc">📱</div><div class="ftitle">Wallet pass check-in</div><p class="fdesc">Members tap their phone at the door. Apple Wallet and Google Wallet. Works on every phone. No app download required.</p></div>
+      <div class="feat"><div class="fic">🥗</div><div class="ftitle">AI nutrition tracking</div><p class="fdesc">Rainback AI estimates macronutrients from menu dish names. Members track their weekly intake across all their restaurants.</p></div>
+      <div class="feat"><div class="fic ol">📊</div><div class="ftitle">Owner dashboard</div><p class="fdesc">Tonight's reservations by member tier. Live vote results. Cash generated. Activity feed. Everything in one screen — desktop and mobile.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DARK PREVIEW -->
+<section id="dp">
+  <div class="wrap">
+    <div class="dp-inner">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.25em;color:var(--tc-s);margin-bottom:18px;display:flex;align-items:center;gap:10px"><span style="width:22px;height:1px;background:var(--tc-s);display:inline-block"></span>The member experience</div>
+        <h2>Designed for <em>belonging,</em><br>not behavior tracking.</h2>
+        <p class="dsub">Members don't open Rainback to earn points. They open it to feel like an insider at the places they love. Quiet, refined, and unmistakably theirs.</p>
+        <div>
+          <div class="dpf"><div class="dfic">⌗</div><div class="dft"><strong>Their card, numbered</strong><span>№ 037 of 200 appears everywhere. They'll Instagram it.</span></div></div>
+          <div class="dpf"><div class="dfic au">🗳️</div><div class="dft"><strong>Vote on what's next</strong><span>Live polls on menu changes, events, wine — members shape the place.</span></div></div>
+          <div class="dpf"><div class="dfic oc">🥗</div><div class="dft"><strong>AI nutrition estimates</strong><span>Macros estimated from dish names. Weekly summary across all visited restaurants.</span></div></div>
+          <div class="dpf"><div class="dfic ol">📍</div><div class="dft"><strong>Discover nearby clubs</strong><span>Interactive map of every restaurant taking members. Filter by availability, distance, cuisine.</span></div></div>
+        </div>
+      </div>
+      <div class="pstage">
+        <div class="ph">
+          <div class="phs">
+            <div class="phn"></div>
+            <div class="phc">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:4px">Good evening</div>
+              <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:400;letter-spacing:-.02em;margin-bottom:18px">Matteo <em style="color:var(--tc)">✦</em></div>
+              <div style="background:var(--ink);color:var(--sand);border-radius:13px;padding:15px;margin-bottom:16px;background-image:radial-gradient(circle at 88% 0%,rgba(197,87,44,.26),transparent 55%)">
+                <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:400;font-style:italic;color:var(--tc-s);margin-bottom:2px">Doya</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc-s);margin-bottom:16px">Wynwood — Miami</div>
+                <div style="display:flex;justify-content:space-between;padding-top:9px;border-top:1px solid rgba(232,181,154,.2)"><div style="font-family:'Fraunces',serif;font-size:11px;font-weight:500">M. Caprioli</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tc-s);font-weight:500">№ 037/200</div></div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:9px">This week</div>
+              <div style="background:var(--sand-w);border:1px solid var(--line);border-radius:9px;padding:11px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:'Fraunces',serif;font-size:12px;font-weight:500">Priority table × 4</div><div style="font-size:9.5px;color:var(--smoke)">Friday or Saturday</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--tc);background:rgba(197,87,44,.1);padding:3px 6px;border-radius:2px">Use</div></div>
+              <div style="background:var(--sand-w);border:1px solid var(--line);border-radius:9px;padding:11px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:'Fraunces',serif;font-size:12px;font-weight:500">Chef's pasta night</div><div style="font-size:9.5px;color:var(--smoke)">May 7 · 8 pm</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--olive);background:rgba(107,122,79,.1);padding:3px 6px;border-radius:2px">RSVP</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section id="comp">
+  <div class="wrap">
+    <div class="ew">Why Rainback wins</div>
+    <h2 class="sh" style="margin-bottom:40px">Every competitor either charges you monthly,<br>takes a cut, or <em>requires discounting.</em></h2>
+    <div class="ctbl-wrap">
+    <div class="ctbl">
+      <div class="crow ch"><div class="cl"></div><div class="cc">Loyalty apps</div><div class="cc">Crowdfunding</div><div class="cc">Dining clubs</div><div class="cc">Rainback</div></div>
+      <div class="crow"><div class="cl">Cash upfront for restaurant</div><div class="cc"><span class="no">No</span></div><div class="cc"><span class="yes">Yes</span></div><div class="cc"><span class="no">No</span></div><div class="cc"><span class="yes">Yes</span></div></div>
+      <div class="crow"><div class="cl">Monthly cost</div><div class="cc">$99–500</div><div class="cc">2–7% rev</div><div class="cc">20–30% cut</div><div class="cc"><span class="yes">$0</span></div></div>
+      <div class="crow"><div class="cl">Restaurant keeps 100%</div><div class="cc">N/A</div><div class="cc"><span class="no">No</span></div><div class="cc"><span class="no">No</span></div><div class="cc"><span class="yes">Yes</span></div></div>
+      <div class="crow"><div class="cl">Builds real community</div><div class="cc"><span class="no">No</span></div><div class="cc"><span class="no">No</span></div><div class="cc"><span class="no">No</span></div><div class="cc"><span class="yes">Yes</span></div></div>
+      <div class="crow crb"><div class="cl">Long-term obligation</div><div class="cc">Monthly</div><div class="cc">Revenue share</div><div class="cc">Discount lock</div><div class="cc"><span class="yes">None</span></div></div>
+    </div>
+    </div>
+    <div class="scroll-hint">← Swipe to compare all options →</div>
+  </div>
+</section>
+
+<!-- FOUNDING OFFER -->
+<section id="founding">
+  <div class="wrap">
+    <div class="fo-inner">
+      <div>
+        <div class="fobadge">Now selecting · 5 founding restaurants in Miami</div>
+        <h2 class="sh">Become one of <em>five.</em></h2>
+        <p class="fosub">We're hand-picking the first founding restaurants in Miami. The five who say yes first keep founding status forever — and shape the platform alongside us.</p>
+        <div class="cities"><div class="city on">Miami</div><div class="city">Paris</div><div class="city">London</div><div class="city">New York</div></div>
+        <div class="plist">
+          <div class="pb"><strong>Free, forever.</strong><span>No fees now or at scale. Lifetime founding-restaurant status on the platform.</span></div>
+          <div class="pb oc"><strong>White-glove launch.</strong><span>We design your membership, perks, and rollout — together, in person, this week.</span></div>
+          <div class="pb ol"><strong>Featured placement.</strong><span>Top of the city map and marketplace, always above all future restaurants.</span></div>
+          <div class="pb au"><strong>Direct line to product.</strong><span>Monthly call with the founder. Your feedback ships in the next release.</span></div>
+        </div>
+        <a href="#apply" class="btn bp">Apply in 4 minutes →</a>
+      </div>
+      <div>
+        <div style="background:var(--ink);color:var(--sand);border-radius:10px;padding:26px;background-image:radial-gradient(circle at 85% 0%,rgba(74,44,58,.48),transparent 60%);margin-bottom:13px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc-s);margin-bottom:14px">From the founder</div>
+          <p style="font-family:'Fraunces',serif;font-style:italic;font-size:17px;line-height:1.42;margin-bottom:18px">"I've been making pizza my whole life — Naples, Paris, Miami, London, Amsterdam, Zurich, Jeddah. I trained the entire Big Mamma kitchen for their first five openings. I ran Addommè in the Marais. Full every night. My regulars didn't come back because of points. They came back because it felt like theirs. Addommè means 'at mine' — at my house. That feeling is what I'm trying to bottle."</p>
+          <div style="display:flex;align-items:center;gap:11px;padding-top:16px;border-top:1px solid rgba(232,181,154,.18)">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--tc);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:17px;font-weight:500;flex-shrink:0">M</div>
+            <div><div style="font-family:'Fraunces',serif;font-size:15px;font-weight:500">Matteo Caprioli</div><div style="font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.18em;color:var(--tc-s);margin-top:2px">Founder · Rainback</div></div>
+          </div>
+        </div>
+        <div style="background:var(--sand);border:1px solid var(--line);border-radius:9px;padding:20px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:14px">Try it · drag to estimate your launch</div>
+
+          <!-- Memberships slider -->
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)">Memberships</span>
+              <span style="font-family:'Fraunces',serif;font-size:18px;font-weight:500;color:var(--ink)" id="calc-mem">200</span>
+            </div>
+            <input type="range" id="calc-mem-slider" min="50" max="500" step="10" value="200" oninput="updateCalc()" style="width:100%"/>
+          </div>
+
+          <!-- Price slider -->
+          <div style="margin-bottom:18px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)">Price each</span>
+              <span style="font-family:'Fraunces',serif;font-size:18px;font-weight:500;color:var(--ink)">$<span id="calc-price">150</span></span>
+            </div>
+            <input type="range" id="calc-price-slider" min="50" max="500" step="10" value="150" oninput="updateCalc()" style="width:100%"/>
+          </div>
+
+          <!-- Result -->
+          <div style="padding-top:14px;border-top:1px solid var(--line)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:5px">If you sell out, you receive</div>
+            <div style="font-family:'Fraunces',serif;font-size:44px;font-weight:300;letter-spacing:-.04em;line-height:1;color:var(--tc)">$<span id="calc-total">30,000</span></div>
+            <div style="font-size:12px;color:var(--ink-s);margin-top:7px">Direct to your account. Same day each membership sells. <strong>You pay nothing.</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATION FORM -->
+<section id="apply" style="background:var(--sand-w);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="fc">
+      <div class="fhdr">
+        <div style="display:inline-block;font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.2em;color:var(--tc);border:1px solid var(--tc);padding:5px 11px;border-radius:2px;margin-bottom:18px">Founding restaurant application</div>
+        <h2 class="sh">Tell us about <em>your house.</em></h2>
+        <p>4 steps · free · no commitment required</p>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="fprog" id="fprog">
+        <div class="fps active" id="ps1"><div class="fpc"><span class="fpc-n">1</span></div><div class="fpl">Restaurant</div></div>
+        <div class="fline" id="fl1"></div>
+        <div class="fps" id="ps2"><div class="fpc"><span class="fpc-n">2</span></div><div class="fpl">Contact</div></div>
+        <div class="fline" id="fl2"></div>
+        <div class="fps" id="ps3"><div class="fpc"><span class="fpc-n">3</span></div><div class="fpl">Membership</div></div>
+        <div class="fline" id="fl3"></div>
+        <div class="fps" id="ps4"><div class="fpc"><span class="fpc-n">4</span></div><div class="fpl">Review</div></div>
+      </div>
+
+      <div class="ferr" id="ferr">Please fill in all required fields.</div>
+
+      <!-- STEP 1 -->
+      <div class="fstep on" id="fs1">
+        <h3 class="stitle">About <em>your restaurant</em></h3>
+        <p class="ssub">This is how members will discover you on the platform. Great descriptions attract more members.</p>
+        <div class="f" id="fi-rn"><label>Restaurant name *</label><input type="text" id="restaurant_name" placeholder="e.g. Doya, Bar Bucce…" autocomplete="off"/><div class="em">Please enter your restaurant name.</div></div>
+        <div class="frow">
+          <div class="f" id="fi-nh"><label>Neighborhood *</label><input type="text" id="neighborhood" placeholder="e.g. Wynwood"/><div class="em">Required.</div></div>
+          <div class="f" id="fi-ci"><label>City *</label><select id="city"><option value="">Select…</option><option>Miami</option><option>New York</option><option>Paris</option><option>London</option></select><div class="em">Please select a city.</div></div>
+        </div>
+        <div class="f" id="fi-cu"><label>Cuisine / style *</label><input type="text" id="cuisine" placeholder="e.g. Aegean · live fire · seafood"/><div class="h">A short line. Members see this when they discover you.</div><div class="em">Required.</div></div>
+        <div class="f"><label>Instagram handle</label><input type="text" id="instagram" placeholder="@yourrestaurant"/><div class="h">Optional. Helps us see your community size.</div></div>
+        <div class="f"><label>Restaurant address</label><input type="text" id="address" placeholder="123 Ocean Drive, Miami FL"/></div>
+        <div class="fnav"><div></div><button class="bnx" onclick="next(2)">Continue → Contact info</button></div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="fstep" id="fs2">
+        <h3 class="stitle">Who <em>are you?</em></h3>
+        <p class="ssub">We'll reach out directly to book your in-person setup session. Founders get priority scheduling.</p>
+        <div class="frow">
+          <div class="f" id="fi-fn"><label>First name *</label><input type="text" id="first_name" placeholder="Matteo"/><div class="em">Required.</div></div>
+          <div class="f" id="fi-ln"><label>Last name *</label><input type="text" id="last_name" placeholder="Caprioli"/><div class="em">Required.</div></div>
+        </div>
+        <div class="f" id="fi-ro"><label>Your role *</label><select id="role"><option value="">Select…</option><option>Owner</option><option>Co-owner</option><option>General Manager</option><option>Operations Director</option><option>Other</option></select><div class="em">Please select your role.</div></div>
+        <div class="f" id="fi-em"><label>Email address *</label><input type="email" id="email" placeholder="matteo@yourrestaurant.com"/><div class="h">We'll send your confirmation here. All replies go to <strong>miamirainback@gmail.com</strong></div><div class="em">Please enter a valid email address.</div></div>
+        <div class="f"><label>Phone number</label><input type="tel" id="phone" placeholder="+1 (305) 000 0000"/><div class="h">Optional. Faster if you want a same-day callback.</div></div>
+        <div class="f"><label>How did you hear about Rainback?</label><select id="referral"><option value="">Select…</option><option>Instagram</option><option>Word of mouth</option><option>Matteo reached out directly</option><option>A fellow restaurant owner</option><option>Press / article</option><option>Other</option></select></div>
+        <div class="fnav"><button class="bbk" onclick="go(1)">← Back</button><button class="bnx" onclick="next(3)">Continue → Membership</button></div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="fstep" id="fs3">
+        <h3 class="stitle">Design your <em>membership.</em></h3>
+        <p class="ssub">You're in control. Set the size, the price, and the perks. You can edit all of this later — this is just your first draft.</p>
+        <div class="f">
+          <label>Total memberships available</label>
+          <div class="sw">
+            <div class="sv"><strong id="capv">200</strong><span>memberships · 1 year each</span></div>
+            <input type="range" id="cap" min="50" max="500" step="10" value="200" oninput="document.getElementById('capv').textContent=this.value"/>
+            <div style="display:flex;justify-content:space-between;margin-top:7px;font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)"><span>50 — Intimate</span><span>500 — Open</span></div>
+          </div>
+          <div class="h" style="margin-top:7px">Most founding restaurants choose 100–250. Scarcity is the point.</div>
+        </div>
+        <div class="frow">
+          <div class="f"><label>Membership price *</label><input type="text" id="price" value="$150" placeholder="$150"/><div class="h">You keep 100%. Members pay 5% on top.</div></div>
+          <div class="f"><label>Duration</label><select id="dur"><option value="1 year">1 year (standard)</option><option value="6 months">6 months</option><option value="Season (3 months)">Season (3 months)</option></select></div>
+        </div>
+        <div class="f">
+          <label>Member perks — choose at least 3 *</label>
+          <div class="ppgrid" id="ppg">
+            <div class="pp on" data-n="Priority weekend table" onclick="tpp(this)"><div class="ppi"><strong>Priority weekend table</strong><span>Guaranteed seating Fri–Sat, up to 4 guests</span></div><div class="ppc">✓</div></div>
+            <div class="pp on" data-n="Members-only chef nights" onclick="tpp(this)"><div class="ppi"><strong>Members-only chef nights</strong><span>Quarterly events with the kitchen team</span></div><div class="ppc">✓</div></div>
+            <div class="pp on" data-n="Early menu access" onclick="tpp(this)"><div class="ppi"><strong>Early menu access</strong><span>2 weeks before public launch</span></div><div class="ppc">✓</div></div>
+            <div class="pp on" data-n="Vote on the menu" onclick="tpp(this)"><div class="ppi"><strong>Vote on the menu</strong><span>Monthly polls — members shape the restaurant</span></div><div class="ppc">✓</div></div>
+            <div class="pp" data-n="Welcome drink on arrival" onclick="tpp(this)"><div class="ppi"><strong>Welcome drink on arrival</strong><span>A glass on the house, every visit</span></div><div class="ppc"></div></div>
+            <div class="pp" data-n="+1 guest at all events" onclick="tpp(this)"><div class="ppi"><strong>+1 guest at all events</strong><span>Members always bring a friend</span></div><div class="ppc"></div></div>
+            <div class="pp" data-n="Members-only wine list" onclick="tpp(this)"><div class="ppi"><strong>Members-only wine list</strong><span>Bottles not available to the public</span></div><div class="ppc"></div></div>
+          </div>
+        </div>
+        <div class="f"><label>Custom perk (optional)</label><input type="text" id="custperk" placeholder="e.g. Monthly tasting, chef's table access…"/></div>
+        <div class="fnav"><button class="bbk" onclick="go(2)">← Back</button><button class="bnx" onclick="next(4)">Review application →</button></div>
+      </div>
+
+      <!-- STEP 4: REVIEW -->
+      <div class="fstep" id="fs4">
+        <h3 class="stitle">Your club, <em>ready.</em></h3>
+        <p class="ssub">Review everything, then submit. Your account and restaurant will be created immediately — you'll be taken directly to your owner dashboard.</p>
+
+        <div class="rmc">
+          <div class="rb">Rain<span>back</span></div><div class="rt">Founding Member</div>
+          <div class="rn" id="rv-name">Your restaurant</div>
+          <div class="rl" id="rv-loc">Neighborhood — City</div>
+          <div class="rft"><div><small>Member since</small><div style="font-family:'Fraunces',serif;font-size:13px;font-weight:500" id="rv-owner">Your name</div></div><div class="rser">№ 001 / <span id="rv-cap">200</span></div></div>
+        </div>
+
+        <div style="background:var(--sand);border:1px solid var(--line);border-radius:9px;padding:18px;margin-bottom:12px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:10px">Restaurant</div>
+          <div class="rrow"><div class="rl">Name</div><div class="rv" id="rv-rn">—</div></div>
+          <div class="rrow"><div class="rl">Location</div><div class="rv" id="rv-rl">—</div></div>
+          <div class="rrow"><div class="rl">Cuisine</div><div class="rv" id="rv-rc">—</div></div>
+          <div class="rrow" style="border-bottom:none"><div class="rl">Instagram</div><div class="rv" id="rv-ri">—</div></div>
+        </div>
+
+        <div style="background:var(--sand);border:1px solid var(--line);border-radius:9px;padding:18px;margin-bottom:12px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:10px">Contact</div>
+          <div class="rrow"><div class="rl">Name</div><div class="rv" id="rv-cn">—</div></div>
+          <div class="rrow"><div class="rl">Role</div><div class="rv" id="rv-cr">—</div></div>
+          <div class="rrow"><div class="rl">Email</div><div class="rv" id="rv-ce">—</div></div>
+          <div class="rrow" style="border-bottom:none"><div class="rl">Phone</div><div class="rv" id="rv-cp">—</div></div>
+        </div>
+
+        <div style="background:var(--sand);border:1px solid var(--line);border-radius:9px;padding:18px;margin-bottom:12px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:10px">Membership</div>
+          <div class="rrow"><div class="rl">Cap</div><div class="rv" id="rv-mc">200 members</div></div>
+          <div class="rrow"><div class="rl">Price</div><div class="rv" id="rv-mp">$150</div></div>
+          <div class="rrow"><div class="rl">Duration</div><div class="rv" id="rv-md">1 year</div></div>
+          <div class="rrow" style="border-bottom:none"><div class="rl">Perks</div><div class="rv" id="rv-mr" style="font-size:12px;color:var(--smoke);text-align:right">—</div></div>
+        </div>
+
+        <div class="projbox">
+          <div class="pl">If you sell out</div>
+          <div class="pv">$<span id="rv-proj">30,000</span></div>
+          <div class="ps">100% to you · same day each membership sells · free for the restaurant · Rainback takes 5% from the member</div>
+        </div>
+
+        <div style="background:var(--sand-w);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:18px;font-size:12.5px;color:var(--ink-s);line-height:1.56">
+          By submitting you confirm this is a genuine restaurant application and agree to Rainback's terms. Queries: <a href="mailto:miamirainback@gmail.com" style="color:var(--tc)">miamirainback@gmail.com</a>
+        </div>
+
+        <div class="fnav">
+          <button class="bbk" onclick="go(3)">← Back</button>
+          <button class="bsub" id="subbtn" onclick="submit()">
+            <span id="sublbl">Submit application →</span>
+            <div class="spin" id="subspin"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="succ" id="succ">
+        <div class="stic">✓</div>
+        <h3>Application <em>received.</em></h3>
+        <p>Thank you for applying. Matteo will review your application personally and reach out within 24 hours to confirm your founding status and book your in-person setup session in Miami.</p>
+        <div class="sbts">
+          <a href="mailto:miamirainback@gmail.com" class="btn bp" style="justify-content:center">Email us directly →</a>
+          <a href="#" class="btn bg" style="justify-content:center;text-decoration:none" onclick="location.reload()">Back to top</a>
+        </div>
+        <div class="wn">
+          <h4>What happens next</h4>
+          <div class="wni"><div class="wnn">01</div><div>Matteo reviews your application personally. You'll hear back within 24 hours.</div></div>
+          <div class="wni"><div class="wnn">02</div><div>If selected, we schedule a 30-minute in-person session in Miami to set up your membership together.</div></div>
+          <div class="wni"><div class="wnn">03</div><div>Your club goes live. We help you announce it. Most founding restaurants sell their first 20 memberships in 48 hours.</div></div>
+          <div class="wni"><div class="wnn">04</div><div>Payments arrive directly in your account. We stay close for your first chef's night and member events.</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="flogo">Rain<span>back</span></div>
+    <div class="fcities">Miami · Paris · London · New York · <strong>More cities coming</strong></div>
+    <p>A members club for the restaurants you love · <a href="mailto:miamirainback@gmail.com">miamirainback@gmail.com</a> · © 2026 Rainback</p>
+  </div>
+</footer>
+
+<script>
+let cur=1;
+
+// GO TO STEP
+function go(n){
+  document.querySelectorAll('.fstep').forEach(s=>s.classList.remove('on'));
+  document.getElementById('fs'+n).classList.add('on');
+  for(let i=1;i<=4;i++){
+    const ps=document.getElementById('ps'+i);
+    ps.classList.remove('active','done');
+    if(i<n)ps.classList.add('done');
+    else if(i===n)ps.classList.add('active');
+    if(i<4)document.getElementById('fl'+i).classList.toggle('done',i<n);
+  }
+  if(n===4)fillReview();
+  cur=n;
+  document.getElementById('ferr').classList.remove('on');
+  document.getElementById('apply').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// NEXT WITH VALIDATION
+function next(n){
+  if(!validate(cur))return;
+  go(n);
+}
+
+// VALIDATION
+function validate(n){
+  const rules={
+    1:[['fi-rn','restaurant_name'],['fi-nh','neighborhood'],['fi-ci','city'],['fi-cu','cuisine']],
+    2:[['fi-fn','first_name'],['fi-ln','last_name'],['fi-ro','role'],['fi-em','email']],
+  };
+  let ok=true;
+  document.getElementById('ferr').classList.remove('on');
+  if(rules[n]){
+    rules[n].forEach(([fid,iid])=>{
+      const el=document.getElementById(fid);
+      const inp=document.getElementById(iid);
+      if(!el||!inp)return;
+      let v=inp.value.trim();
+      let valid=!!v;
+      if(iid==='email')valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      el.classList.toggle('inv',!valid);
+      if(!valid)ok=false;
+    });
+  }
+  if(n===3){
+    const sel=document.querySelectorAll('.pp.on').length;
+    if(sel<3){ok=false;document.getElementById('ferr').textContent='Please select at least 3 perks before continuing.';document.getElementById('ferr').classList.add('on');return false;}
+  }
+  if(!ok){document.getElementById('ferr').classList.add('on');document.getElementById('ferr').textContent='Please fill in all required fields before continuing.';}
+  return ok;
+}
+
+// FILL REVIEW
+function fillReview(){
+  const g=id=>document.getElementById(id)?.value?.trim()||'';
+  const rn=g('restaurant_name'),nh=g('neighborhood'),ci=g('city');
+  const fn=g('first_name'),ln=g('last_name');
+  const cap=document.getElementById('cap')?.value||'200';
+  const pr=g('price')||'$150';
+  const dur=document.getElementById('dur')?.value||'1 year';
+  const perks=[...document.querySelectorAll('.pp.on')].map(p=>p.dataset.n).join(' · ');
+  const pn=parseInt(pr.replace(/\D/g,''))||150;
+  const cn=parseInt(cap)||200;
+
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  s('rv-name',rn||'Your restaurant');
+  s('rv-loc',(nh||'Neighborhood')+' — '+(ci||'City'));
+  s('rv-owner',(fn?fn[0]+'. ':'')+ln||'Your name');
+  s('rv-cap',cap);
+  s('rv-rn',rn||'—');
+  s('rv-rl',(nh||'—')+', '+(ci||'—'));
+  s('rv-rc',g('cuisine')||'—');
+  s('rv-ri',g('instagram')||'—');
+  s('rv-cn',(fn+' '+ln).trim()||'—');
+  s('rv-cr',g('role')||'—');
+  s('rv-ce',g('email')||'—');
+  s('rv-cp',g('phone')||'—');
+  s('rv-mc',cap+' members');
+  s('rv-mp',pr);
+  s('rv-md',dur);
+  s('rv-mr',perks||'—');
+  s('rv-proj',(pn*cn).toLocaleString());
+}
+
+// PERK TOGGLE
+function tpp(el){
+  el.classList.toggle('on');
+  el.querySelector('.ppc').textContent=el.classList.contains('on')?'✓':'';
+}
+
+// SUBMIT
+const API = 'https://rainback-backend-production.up.railway.app';
+
+async function submit(){
+  const g=id=>document.getElementById(id)?.value?.trim()||'';
+  const btn=document.getElementById('subbtn');
+  const lbl=document.getElementById('sublbl');
+  const sp=document.getElementById('subspin');
+  btn.disabled=true;lbl.style.display='none';sp.style.display='block';
+
+  const cap=document.getElementById('cap')?.value||'200';
+  const perks=[...document.querySelectorAll('.pp.on')].map(p=>p.dataset.n).join(' | ');
+  const rn=g('restaurant_name'),ci=g('city');
+  const email=g('email');
+  const firstName=g('first_name');
+  const lastName=g('last_name');
+  const password=g('phone')||'Rainback2026!'; // use phone as temp password or default
+
+  const errEl=document.getElementById('ferr');
+
+  try{
+    // Step 1: Create owner account
+    const signupRes=await fetch(API+'/api/auth/signup',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password,firstName,lastName,role:'owner'})
+    });
+
+    let token,userId;
+    if(signupRes.ok){
+      const signupData=await signupRes.json();
+      token=signupData.token;
+      userId=signupData.user?.id;
+    } else if(signupRes.status===409){
+      // Already registered — log in instead
+      const loginRes=await fetch(API+'/api/auth/login',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email,password})
+      });
+      if(loginRes.ok){
+        const loginData=await loginRes.json();
+        token=loginData.token;
+      } else {
+        // Account exists but wrong password — still proceed to create restaurant
+        const loginData=await loginRes.json().catch(()=>({}));
+        token=null;
+      }
+    }
+
+    if(!token){
+      // Try OTP path — send code to email
+      await fetch(API+'/api/auth/otp/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    }
+
+    // Step 2: Create restaurant (works even without token for now)
+    const restRes=await fetch(API+'/api/restaurants/apply',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        restaurantName:rn,
+        neighborhood:g('neighborhood'),
+        city:ci,
+        cuisine:g('cuisine'),
+        instagram:g('instagram'),
+        address:g('address'),
+        firstName,lastName,
+        role:g('role'),
+        email,
+        phone:g('phone'),
+        referral:g('referral'),
+        membershipCap:cap,
+        membershipPrice:g('price'),
+        duration:document.getElementById('dur')?.value||'1 year',
+        perks,
+        customPerk:g('custperk'),
+      })
+    });
+
+    // Step 3: If we have a token, save it and redirect to owner app
+    if(token){
+      localStorage.setItem('rb_owner_token', token);
+      // Create the restaurant properly now that we are authenticated
+      const createRes=await fetch(API+'/api/restaurants',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({
+          name:rn,
+          neighborhood:g('neighborhood'),
+          city:ci,
+          country:'US',
+          cuisine:g('cuisine'),
+          instagram:g('instagram'),
+          address:g('address'),
+          membershipCap:parseInt(cap)||200,
+          membershipPrice:parseFloat(g('price'))||150,
+          membershipDuration:document.getElementById('dur')?.value||'1 year',
+          tierName:'Founding Member',
+        })
+      });
+      if(createRes.ok){
+        const rest=await createRes.json();
+        localStorage.setItem('rb_restaurant_id', rest.id);
+      }
+      // Redirect to owner dashboard
+      setTimeout(()=>{ window.location.href='/owner'; },800);
+      showSuccess();
+      return;
+    }
+
+    showSuccess();
+  } catch(err){
+    console.error(err);
+    btn.disabled=false;
+    lbl.style.display='block';
+    sp.style.display='none';
+    if(errEl){ errEl.textContent='Something went wrong. Please try again.'; errEl.classList.add('on'); }
+  }
+}
+
+function showSuccess(){
+  document.querySelectorAll('.fstep').forEach(s=>s.style.display='none');
+  document.getElementById('fprog').style.display='none';
+  document.getElementById('ferr').style.display='none';
+  document.getElementById('succ').style.display='block';
+  document.getElementById('apply').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// LIVE CALCULATOR
+function updateCalc(){
+  const m=parseInt(document.getElementById('calc-mem-slider')?.value||200);
+  const p=parseInt(document.getElementById('calc-price-slider')?.value||150);
+  const total=(m*p).toLocaleString();
+  document.getElementById('calc-mem').textContent=m;
+  document.getElementById('calc-price').textContent=p;
+  document.getElementById('calc-total').textContent=total;
+}
+
+// SMOOTH ANCHORS
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',function(e){
+    const id=this.getAttribute('href').slice(1);
+    const el=document.getElementById(id);
+    if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+});
+</script>
+</body>
+</html>
