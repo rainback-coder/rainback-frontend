@@ -1,7 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/member", "destination": "/member-app.html" },
-    { "source": "/owner", "destination": "/owner-dashboard.html" },
-    { "source": "/admin", "destination": "/admin.html" }
-  ]
-}
