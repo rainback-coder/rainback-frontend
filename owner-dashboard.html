@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="theme-color" content="#F2EADC"/>
+<title>Rainback for Restaurants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --terracotta:#C5572C; --terracotta-dark:#9E4220; --terracotta-soft:#E8B59A;
+    --olive:#6B7A4F; --olive-soft:#A8B084; --olive-tint:rgba(107,122,79,.08);
+    --aubergine:#4A2C3A; --aubergine-soft:#8B6478;
+    --ochre:#C89B4F; --ochre-soft:#E5CFA0;
+    --sand:#F2EADC; --sand-warm:#EAE0CC; --sand-deep:#DDD0B6;
+    --ink:#2A1F17; --ink-soft:#5C4A3A; --smoke:#8E7D6B;
+    --line:rgba(42,31,23,.1); --line-strong:rgba(42,31,23,.18);
+    --success:#6B7A4F;
+    --aubergine-tint:rgba(74,44,58,.08); --ochre-tint:rgba(200,155,79,.12); --terracotta-tint:rgba(197,87,44,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Inter Tight',sans-serif;color:var(--ink);background:var(--sand);min-height:100vh;-webkit-font-smoothing:antialiased;line-height:1.5}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:1000;mix-blend-mode:multiply}
+
+  /* Layout */
+  .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  @media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{display:none!important;position:fixed;top:0;left:0;width:80%;max-width:300px;height:100vh;z-index:300;box-shadow:8px 0 40px rgba(0,0,0,.3)}.sidebar.open{display:flex!important}.mobile-nav-toggle{display:flex!important}.main{padding-top:74px}}
+
+  /* Sidebar */
+  .sidebar{background:var(--ink);color:var(--sand);padding:28px 20px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar-logo{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.02em}
+  .sidebar-logo span{color:var(--terracotta-soft)}
+  .sidebar-restaurant{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--terracotta-soft);padding-bottom:24px;border-bottom:1px solid rgba(232,181,154,.15);margin-bottom:24px;margin-top:4px}
+  .sidebar-section{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:rgba(232,181,154,.5);margin:24px 0 8px;padding-left:12px}
+  .sidebar-link{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;color:rgba(242,234,220,.7);cursor:pointer;margin-bottom:2px;transition:all .15s;font-size:14px;font-weight:500;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+  .sidebar-link:hover{background:rgba(242,234,220,.05);color:var(--sand)}
+  .sidebar-link.active{background:var(--terracotta);color:var(--sand)}
+  .sidebar-icon{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .sidebar-foot{margin-top:auto;padding-top:20px;border-top:1px solid rgba(232,181,154,.15);display:flex;align-items:center;gap:10px}
+  .sidebar-avatar{width:32px;height:32px;border-radius:50%;background:var(--terracotta);color:var(--sand);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:13px;font-weight:500}
+  .sidebar-user-info{flex:1;min-width:0}
+  .sidebar-user-name{font-size:13px;font-weight:500}
+  .sidebar-user-role{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--terracotta-soft)}
+  .mobile-nav-toggle{display:none;position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--sand);border:none;align-items:center;justify-content:center;z-index:200;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+
+  /* Main */
+  .main{padding:32px 40px 60px;overflow-x:hidden;min-width:0}
+  @media(max-width:600px){.main{padding:70px 20px 60px}}
+  .back-btn{background:none;border:1px solid var(--line-strong);color:var(--smoke);font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;font-weight:500;padding:8px 14px;border-radius:100px;cursor:pointer;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;transition:all .18s}
+  .back-btn:hover{background:var(--ink);color:var(--sand);border-color:var(--ink)}
+  .back-btn::before{content:'←';font-size:13px}
+  .main-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:20px;flex-wrap:wrap}
+  .main-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:8px}
+  .main-title{font-family:'Fraunces',serif;font-size:clamp(28px,4vw,40px);font-weight:400;letter-spacing:-.025em;line-height:1.05;margin-bottom:4px}
+  .main-title em{font-style:italic;color:var(--terracotta)}
+  .main-sub{font-size:14px;color:var(--smoke)}
+  .header-actions{display:flex;gap:10px}
+
+  /* Buttons */
+  .btn{padding:12px 22px;border:none;border-radius:100px;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .btn-primary{background:var(--ink);color:var(--sand)}
+  .btn-primary:hover{background:var(--terracotta);transform:translateY(-1px)}
+  .btn-secondary{background:transparent;color:var(--ink);border:1px solid var(--line-strong)}
+  .btn-secondary:hover{background:var(--sand-warm)}
+  .btn-ghost{background:transparent;color:var(--smoke);padding:10px 14px}
+  .btn-aubergine{background:var(--aubergine);color:var(--sand)}
+
+  /* Views */
+  .view{display:none;animation:fadeIn .3s ease}
+  .view.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* KPIs */
+  .perks-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:760px}
+  @media(max-width:700px){.perks-gallery{grid-template-columns:1fr}}
+  .perk-tile{background:var(--sand-warm);border:1.5px solid var(--line);border-radius:12px;padding:15px 17px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;transition:all .18s}
+  .perk-tile.on{background:rgba(107,122,79,.1);border-color:var(--olive)}
+  .perk-tile .pt-txt strong{display:block;font-family:'Fraunces',serif;font-size:15px;font-weight:500;margin-bottom:2px;color:var(--ink)}
+  .perk-tile .pt-txt span{font-size:12px;color:var(--smoke);line-height:1.35}
+  .perk-tile .pt-check{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .18s;color:transparent}
+  .perk-tile.on .pt-check{background:var(--olive);border-color:var(--olive);color:#fff}
+  .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:28px}
+  @media(max-width:600px){.kpi-grid{gap:10px}.kpi-card{padding:16px 14px}.kpi-value{font-size:24px}}
+  .kpi-card{background:var(--sand-warm);border:1px solid var(--line);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
+  .kpi-card.dark{background:var(--ink);color:var(--sand);background-image:radial-gradient(circle at 90% 0%,rgba(197,87,44,.15),transparent 60%)}
+  .kpi-card.aubergine{background:var(--aubergine);color:var(--sand);background-image:radial-gradient(circle at 90% 0%,rgba(200,155,79,.18),transparent 60%)}
+  .kpi-card.olive-tint{background:var(--olive-tint)}
+  .kpi-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:12px}
+  .kpi-card.dark .kpi-label{color:var(--terracotta-soft)}
+  .kpi-card.aubergine .kpi-label{color:var(--ochre-soft)}
+  .kpi-value{font-family:'Fraunces',serif;font-size:40px;font-weight:400;letter-spacing:-.03em;line-height:1;margin-bottom:8px}
+  .kpi-card.dark .kpi-value{color:var(--terracotta-soft)}
+  .kpi-card.aubergine .kpi-value{color:var(--ochre)}
+  .kpi-value sup{font-size:18px;color:var(--smoke);font-weight:400}
+  .kpi-trend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--smoke)}
+  .kpi-trend.up{color:var(--olive)}
+  .kpi-card.dark .kpi-trend.up{color:var(--olive-soft)}
+
+  /* Progress */
+  .progress-card{background:var(--sand-warm);border:1px solid var(--line);border-radius:18px;padding:28px;margin-bottom:24px}
+  .progress-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px}
+  .progress-title{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:var(--smoke);margin-bottom:6px}
+  .progress-fraction{font-family:'Fraunces',serif;font-size:48px;font-weight:400;letter-spacing:-.03em;line-height:1}
+  .progress-fraction span{color:var(--smoke);font-style:italic;font-weight:300}
+  .progress-pct{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--terracotta);font-weight:500}
+  .progress-bar{height:10px;background:var(--sand-deep);border-radius:5px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--terracotta),var(--terracotta-dark));border-radius:5px;transition:width .6s ease}
+  .progress-meta{display:flex;justify-content:space-between;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)}
+
+  /* Two-col */
+  .two-col{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;margin-bottom:24px}
+  @media(max-width:1100px){.two-col{grid-template-columns:1fr}}
+
+  /* Panel */
+  .panel{background:var(--sand-warm);border:1px solid var(--line);border-radius:18px;padding:24px 28px}
+  .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .panel-title{font-family:'Fraunces',serif;font-size:22px;font-weight:500;letter-spacing:-.02em}
+  .panel-action{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--terracotta);cursor:pointer;font-weight:500;background:none;border:none}
+
+  /* Res table */
+  .res-row{display:grid;grid-template-columns:60px 1fr auto auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+  .res-row:last-child{border-bottom:none}
+  .res-time{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500}
+  .res-member-name{font-family:'Fraunces',serif;font-size:16px;font-weight:500;letter-spacing:-.01em;margin-bottom:2px}
+  .res-member-meta{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--terracotta);font-weight:500}
+  .res-party{font-size:13px;color:var(--smoke)}
+  .res-tag{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--olive);background:var(--olive-tint);padding:4px 8px;border-radius:2px;font-weight:500}
+  .res-tag.priority{color:var(--terracotta);background:rgba(197,87,44,.08)}
+  .res-tag.aubergine{color:var(--aubergine);background:rgba(74,44,58,.1)}
+
+  /* Vote */
+  .vote-result{background:var(--sand);border-radius:12px;padding:14px 16px;margin-bottom:8px;border:1px solid var(--line);position:relative;overflow:hidden}
+  .vote-bar{position:absolute;inset:0 auto 0 0;background:rgba(197,87,44,.1);z-index:0}
+  .vote-row-content{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center}
+  .vote-text{font-family:'Fraunces',serif;font-size:14px;font-weight:500}
+  .vote-stat{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500}
+  .vote-status{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between}
+  .urgent{color:var(--terracotta-dark);font-weight:500}
+
+  /* Activity */
+  .activity-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+  .activity-item:last-child{border-bottom:none;padding-bottom:0}
+  .activity-dot{width:8px;height:8px;border-radius:50%;background:var(--terracotta);margin-top:7px;flex-shrink:0}
+  .activity-dot.olive{background:var(--olive)}
+  .activity-dot.muted{background:var(--smoke)}
+  .activity-dot.aubergine{background:var(--aubergine)}
+  .activity-dot.ochre{background:var(--ochre)}
+  .activity-text{flex:1;font-size:14px;line-height:1.45}
+  .activity-text strong{font-weight:600}
+  .activity-amount{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--olive);font-weight:500}
+  .activity-time{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);flex-shrink:0;margin-top:2px}
+
+  /* Chart */
+  .chart-card{background:var(--sand-warm);border:1px solid var(--line);border-radius:18px;padding:24px 28px;margin-bottom:24px}
+  .chart-svg{width:100%;height:200px;display:block}
+  .chart-x-labels{display:flex;justify-content:space-between;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)}
+
+  /* Members table */
+  .members-toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+  .search-box{flex:1;min-width:240px;background:var(--sand-warm);border:1px solid var(--line);border-radius:100px;padding:12px 18px;font-family:'Inter Tight',sans-serif;font-size:14px}
+  .search-box:focus{outline:none;border-color:var(--terracotta);background:var(--sand)}
+  .filter-pill{padding:12px 18px;border-radius:100px;background:var(--sand-warm);border:1px solid var(--line);font-size:13px;color:var(--ink);cursor:pointer;font-family:inherit;transition:all .2s}
+  .filter-pill.active{background:var(--ink);color:var(--sand);border-color:var(--ink)}
+  .members-table{background:var(--sand-warm);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .table-row{display:grid;grid-template-columns:50px 1.5fr 1fr 1fr 1fr 80px;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
+  .table-row:hover{background:var(--sand)}
+  .table-row.head{background:var(--sand-deep);font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);cursor:default;padding:12px 24px}
+  .table-row.head:hover{background:var(--sand-deep)}
+  .table-row:last-child{border-bottom:none}
+  .table-serial{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--terracotta);font-weight:500}
+  .table-name{font-family:'Fraunces',serif;font-size:16px;font-weight:500;letter-spacing:-.01em}
+  .table-name small{display:block;font-family:'Inter Tight',sans-serif;font-size:11px;color:var(--smoke);font-weight:400;margin-top:1px}
+  .table-cell{font-size:13px;color:var(--ink-soft)}
+  .table-tier{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;padding:4px 8px;border-radius:2px;display:inline-block;font-weight:500;width:fit-content}
+  .table-tier.founding{background:rgba(74,44,58,.12);color:var(--aubergine)}
+  .table-tier.member{background:var(--olive-tint);color:var(--olive)}
+
+  /* Overlay */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(42,31,23,.6);z-index:100;backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
+  body.overlay-open{position:fixed;width:100%;overflow:hidden}
+  .overlay.active{display:flex;animation:fadeIn .3s ease}
+  .overlay-card{background:var(--sand);border-radius:22px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:36px 32px;position:relative}
+  .overlay-close{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line-strong);background:var(--sand-warm);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+  .member-profile-card{background:var(--ink);color:var(--sand);border-radius:18px;padding:24px;margin-bottom:20px;background-image:radial-gradient(circle at 85% 0%,rgba(197,87,44,.25),transparent 55%)}
+  .profile-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px}
+  .profile-brand{font-family:'Fraunces',serif;font-size:13px;font-weight:500}
+  .profile-brand span{color:var(--terracotta-soft)}
+  .profile-name{font-family:'Fraunces',serif;font-size:32px;font-weight:400;letter-spacing:-.02em;line-height:1;margin-bottom:4px}
+  .profile-tier{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--ochre);border:1px solid var(--ochre);padding:4px 8px;border-radius:2px}
+  .profile-foot{margin-top:28px;padding-top:14px;border-top:1px solid rgba(232,181,154,.25);display:flex;justify-content:space-between;align-items:flex-end}
+  .profile-foot small{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.18em;color:var(--terracotta-soft);display:block;margin-bottom:3px}
+  .profile-foot .joined{font-family:'Fraunces',serif;font-size:14px}
+  .profile-serial{font-family:'JetBrains Mono',monospace;color:var(--terracotta-soft);font-weight:500}
+  .profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+  .stat-tile{background:var(--sand-warm);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat-label{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);margin-bottom:6px}
+  .stat-value{font-family:'Fraunces',serif;font-size:22px;font-weight:500;letter-spacing:-.02em}
+  .profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* Forms */
+  .form-section{margin-bottom:24px}
+  .form-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:8px;display:block}
+  .form-input,.form-textarea,.form-select{width:100%;padding:14px 16px;background:var(--sand);border:1px solid var(--line);border-radius:12px;font-family:'Inter Tight',sans-serif;font-size:15px;color:var(--ink);transition:all .2s}
+  .form-input:focus,.form-textarea:focus,.form-select:focus{outline:none;border-color:var(--terracotta);background:var(--sand-warm)}
+  .form-textarea{min-height:100px;resize:vertical;font-family:inherit}
+  .form-helper{font-size:12px;color:var(--smoke);margin-top:6px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* Events */
+  .event-card{background:var(--sand-warm);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:12px;display:grid;grid-template-columns:80px 1fr auto;gap:20px;align-items:center;cursor:pointer;transition:all .2s}
+  .event-card:hover{border-color:var(--line-strong)}
+  .event-date-block{text-align:center;padding:10px 0;background:var(--sand);border-radius:12px}
+  .event-day{font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.025em;line-height:1;color:var(--terracotta)}
+  .event-month{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-top:4px}
+  .event-info h4{font-family:'Fraunces',serif;font-size:18px;font-weight:500;letter-spacing:-.015em;margin-bottom:4px}
+  .event-info-meta{font-size:12px;color:var(--smoke);margin-bottom:6px}
+  .event-info-rsvp{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--olive);font-weight:500}
+  .event-info-rsvp.full{color:var(--terracotta-dark)}
+  .event-status{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--olive);background:var(--olive-tint);padding:5px 10px;border-radius:2px;font-weight:500}
+  .event-status.draft{color:var(--smoke);background:rgba(142,125,107,.1)}
+
+  /* Votes */
+  .vote-card{background:var(--sand-warm);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:14px}
+  .vote-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+  .vote-card-title{font-family:'Fraunces',serif;font-size:20px;font-weight:500;letter-spacing:-.015em;margin-bottom:4px}
+  .vote-card-meta{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)}
+  .vote-card-status{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;padding:5px 10px;border-radius:2px;font-weight:500}
+  .vote-card-status.live{color:var(--terracotta);background:rgba(197,87,44,.08)}
+  .vote-card-status.closed{color:var(--smoke);background:rgba(142,125,107,.1)}
+
+  /* Notes */
+  .compose-grid{display:grid;grid-template-columns:1fr 320px;gap:24px}
+  @media(max-width:900px){.compose-grid{grid-template-columns:1fr}}
+  .preview-phone{background:var(--ink);border-radius:30px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.2);height:fit-content;position:sticky;top:20px}
+  .preview-screen{background:var(--sand);border-radius:22px;padding:50px 16px 80px;min-height:480px;position:relative}
+  .preview-notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:90px;height:22px;background:var(--ink);border-radius:16px}
+  .preview-notification{background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-radius:16px;padding:14px 16px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid rgba(255,255,255,.5)}
+  .preview-notif-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .preview-notif-icon{width:22px;height:22px;border-radius:5px;background:var(--terracotta);color:var(--sand);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:11px;font-weight:500}
+  .preview-notif-app{font-size:11px;color:var(--smoke);flex:1;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+  .preview-notif-time{font-size:11px;color:var(--smoke)}
+  .preview-notif-title{font-size:14px;font-weight:600;margin-bottom:2px;color:var(--ink)}
+  .preview-notif-body{font-size:13px;color:var(--ink-soft);line-height:1.4}
+
+  /* Perks */
+  .perk-row-item{background:var(--sand-warm);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .perk-row-info{flex:1}
+  .perk-row-name{font-family:'Fraunces',serif;font-size:17px;font-weight:500;letter-spacing:-.015em;margin-bottom:4px}
+  .perk-row-desc{font-size:13px;color:var(--smoke);line-height:1.45}
+  .perk-row-stats{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--olive);font-weight:500;margin-top:8px}
+  .perk-row-actions{display:flex;gap:8px}
+  .icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--sand);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .icon-btn:hover{border-color:var(--line-strong);background:var(--sand-warm)}
+
+  /* Menu/nutrition */
+  .menu-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px}
+  @media(max-width:720px){.menu-summary-grid{grid-template-columns:1fr 1fr}}
+  .menu-summary-tile{background:var(--sand);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .mst-label{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:8px}
+  .mst-value{font-family:'Fraunces',serif;font-size:26px;font-weight:500;letter-spacing:-.025em;line-height:1;color:var(--ink)}
+  .mst-value span{font-size:14px;color:var(--smoke);font-weight:400;margin-left:2px}
+  .mst-sub{font-size:10.5px;color:var(--smoke);margin-top:5px}
+  .menu-top-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--sand);border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:all .15s;gap:12px}
+  .menu-top-row:hover{border-color:var(--terracotta);background:var(--terracotta-tint)}
+  .menu-top-name{font-family:'Fraunces',serif;font-size:14px;font-weight:500;letter-spacing:-.01em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .menu-top-meta{font-size:11px;color:var(--smoke);display:flex;align-items:center;gap:8px}
+  .menu-top-views{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--terracotta);font-weight:500;flex-shrink:0}
+  .menu-mode-toggle{display:flex;background:var(--sand-warm);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:24px;max-width:480px}
+  .menu-mode-toggle button{flex:1;padding:12px 14px;border:none;background:transparent;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;color:var(--smoke);cursor:pointer;border-radius:8px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+  .menu-mode-toggle button.on{background:var(--ink);color:var(--sand)}
+  .menu-mode-info{background:var(--aubergine-tint);border:1px solid rgba(74,44,58,.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--ink-soft);line-height:1.5;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start}
+  .menu-mode-info .icon{flex-shrink:0;font-size:18px;margin-top:-1px}
+  .menu-mode-info strong{color:var(--aubergine);font-weight:600}
+  .dish-grid{display:grid;gap:10px}
+  .dish-card{background:var(--sand-warm);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:flex-start}
+  .dish-card-info{min-width:0}
+  .dish-name{font-family:'Fraunces',serif;font-size:17px;font-weight:500;letter-spacing:-.01em;margin-bottom:4px}
+  .dish-desc{font-size:12.5px;color:var(--smoke);line-height:1.5;margin-bottom:10px}
+  .dish-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .dish-tag{font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.15em;padding:3px 8px;border-radius:2px;font-weight:500}
+  .dish-tag.ai{background:var(--aubergine-tint);color:var(--aubergine)}
+  .dish-tag.precise{background:rgba(107,122,79,.1);color:var(--olive)}
+  .dish-tag.cat{background:var(--sand-deep);color:var(--ink-soft)}
+  .dish-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-top:10px;border-top:1px solid var(--line)}
+  .dish-macro{text-align:center;padding:6px 4px}
+  .dish-macro .v{font-family:'Fraunces',serif;font-size:16px;font-weight:500;letter-spacing:-.015em;color:var(--ink)}
+  .dish-macro .l{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-top:2px}
+  .dish-actions{display:flex;flex-direction:column;gap:6px}
+  .dish-actions .icon-btn{width:32px;height:32px}
+  .add-dish-form{display:grid;gap:16px}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ingredient-row{display:grid;grid-template-columns:1fr 80px 32px;gap:8px;align-items:center;margin-bottom:8px}
+  .ingredient-row input{background:var(--sand);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-family:'Inter Tight',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .18s}
+  .ingredient-row input:focus{border-color:var(--terracotta)}
+  .ingredient-row .remove-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--sand);color:var(--smoke);cursor:pointer;font-size:14px}
+  .add-ingredient-btn{background:transparent;border:1px dashed var(--line-strong);color:var(--smoke);padding:10px;border-radius:8px;font-family:'Inter Tight',sans-serif;font-size:12px;cursor:pointer;width:100%;transition:all .15s}
+  .add-ingredient-btn:hover{border-color:var(--terracotta);color:var(--terracotta)}
+  .live-macros{background:var(--ink);color:var(--sand);border-radius:12px;padding:16px 18px;margin-top:8px;background-image:radial-gradient(circle at 90% 0%,rgba(74,44,58,.4),transparent 55%)}
+  .live-macros-label{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--terracotta-soft);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .live-macros-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .live-macro{text-align:center;padding:8px 0}
+  .live-macro .v{font-family:'Fraunces',serif;font-size:22px;font-weight:500;color:var(--terracotta-soft);letter-spacing:-.02em}
+  .live-macro .l{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.15em;color:var(--terracotta-soft);opacity:.8;margin-top:2px}
+
+  /* Hint / Empty */
+  .hint-banner{background:var(--olive-tint);border:1px solid rgba(107,122,79,.2);border-radius:12px;padding:14px 18px;font-size:13px;color:var(--olive);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+  .empty-view{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 32px;text-align:center}
+  .empty-view .ei{width:64px;height:64px;border-radius:50%;background:var(--sand-warm);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:20px}
+  .empty-view h3{font-family:'Fraunces',serif;font-size:24px;font-weight:400;letter-spacing:-.02em;margin-bottom:8px}
+  .empty-view h3 em{font-style:italic;color:var(--terracotta)}
+  .empty-view p{font-size:14px;color:var(--smoke);line-height:1.55;max-width:300px;margin-bottom:24px}
+
+  /* Toast */
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--sand);padding:14px 24px;border-radius:100px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:all .3s;pointer-events:none;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast .ok{color:var(--olive-soft);margin-right:8px}
+
+  @media(max-width:600px){
+    .kpi-value{font-size:32px} .progress-fraction{font-size:36px} .panel{padding:20px 22px}
+    .res-row,.table-row{grid-template-columns:50px 1fr auto;gap:12px}
+    .res-tag,.table-cell:not(:last-child){display:none} .table-row.head{display:none}
+    .event-card{grid-template-columns:60px 1fr} .event-status{display:none}
+    .dish-card{grid-template-columns:1fr} .dish-actions{flex-direction:row;justify-content:flex-end}
+    .menu-mode-toggle{max-width:100%} .form-row-2{grid-template-columns:1fr}
+  }
+
+/* ── OWNER LOGIN ── */
+#owner-auth-screen{position:fixed;inset:0;background:var(--sand);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+.owner-login-card{background:white;border:1px solid var(--line);border-radius:20px;padding:48px 40px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(42,31,23,.12)}
+
+.owner-social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border-radius:100px;font-family:'Inter Tight',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;border:1.5px solid var(--ink);transition:transform .1s}
+.owner-social-btn:active{transform:scale(.985)}
+.owner-social-apple{background:var(--ink);color:#fff}
+.owner-social-google{background:#fff;color:#3c4043;border-color:var(--line)}
+.owner-auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--smoke);font-size:12px}
+.owner-auth-divider::before,.owner-auth-divider::after{content:'';flex:1;height:1px;background:var(--line)}
+.owner-login-logo{font-family:'Fraunces',serif;font-size:22px;font-weight:500;color:var(--ink);margin-bottom:6mm}
+.owner-login-logo span{color:var(--terracotta)}
+.owner-auth-title{font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.025em;margin-bottom:4px}
+.owner-auth-title em{font-style:italic;color:var(--terracotta)}
+.owner-auth-sub{font-size:13px;color:var(--smoke);margin-bottom:8mm}
+.owner-auth-input{width:100%;padding:14px 16px;background:var(--sand);border:1.5px solid var(--line);border-radius:12px;font-family:'Inter Tight',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .2s;margin-bottom:10px;display:block}
+.owner-auth-input:focus{border-color:var(--terracotta)}
+.owner-auth-btn{background:var(--ink);color:var(--sand);border:none;border-radius:100px;padding:15px;font-family:'Inter Tight',sans-serif;font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;width:100%;transition:background .2s;margin-top:4px}
+.owner-auth-btn:hover{background:var(--terracotta)}
+.owner-auth-btn.ghost{background:transparent;color:var(--terracotta);border:1.5px solid var(--terracotta);margin-top:8px}
+.owner-auth-toggle{text-align:center;margin-top:14px;font-size:13px;color:var(--smoke)}
+.owner-auth-toggle a{color:var(--terracotta);cursor:pointer;font-weight:500}
+.owner-auth-error{background:rgba(197,87,44,.1);border:1px solid rgba(197,87,44,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#9E4220;margin-bottom:10px;display:none}
+.owner-auth-error.show{display:block}
+.owner-name-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ── OWNER RESTAURANT ONBOARDING ── */
+#owner-onboard{position:fixed;inset:0;background:var(--sand);z-index:480;display:none;overflow-y:auto;padding:0}
+#owner-onboard.active{display:block}
+.onb-wrap{max-width:560px;margin:0 auto;padding:40px 24px 60px}
+.onb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.onb-logo{font-family:'Fraunces',serif;font-size:20px;font-weight:500;color:var(--ink)}
+.onb-logo span{color:var(--terracotta)}
+.onb-prog{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)}
+.onb-bar{height:3px;background:var(--line);border-radius:3px;margin:14px 0 30px;overflow:hidden}
+.onb-fill{height:100%;background:var(--terracotta);border-radius:3px;transition:width .3s;width:25%}
+.ostep{display:none}
+.ostep.on{display:block;animation:fadeUp .3s ease}
+.ostitle{font-family:'Fraunces',serif;font-size:30px;font-weight:400;letter-spacing:-.025em;margin-bottom:7px}
+.ostitle em{font-style:italic;color:var(--terracotta)}
+.osub{font-size:14.5px;color:var(--smoke);margin-bottom:26px;line-height:1.5}
+.of{margin-bottom:18px}
+.of label{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.16em;color:var(--smoke);display:block;margin-bottom:7px}
+.of input,.of select,.of textarea{width:100%;padding:13px 16px;background:#fff;border:1px solid var(--line);border-radius:8px;font-family:'Inter Tight',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .2s;-webkit-appearance:none}
+.of input:focus,.of select:focus,.of textarea:focus{border-color:var(--terracotta)}
+.ofrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:480px){.ofrow{grid-template-columns:1fr}}
+.osw{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px}
+.osv{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.osv strong{font-family:'Fraunces',serif;font-size:44px;font-weight:400;letter-spacing:-.04em;line-height:1;color:var(--terracotta)}
+.osv span{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)}
+.osw input[type=range]{width:100%}
+.oppgrid{display:grid;gap:8px}
+.opp{background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .18s;gap:11px}
+.opp.on{background:var(--sand);border-color:var(--terracotta);box-shadow:0 0 0 1px var(--terracotta)}
+.opp .oppi strong{display:block;font-family:'Fraunces',serif;font-size:14px;font-weight:500;margin-bottom:2px}
+.opp .oppi span{font-size:11.5px;color:var(--smoke)}
+.oppc{width:25px;height:25px;border-radius:50%;border:1.5px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .18s;font-size:13px}
+.opp.on .oppc{background:var(--terracotta);border-color:var(--terracotta);color:#fff}
+.onb-nav{display:flex;justify-content:space-between;align-items:center;padding-top:26px;margin-top:20px;border-top:1px solid var(--line)}
+.onb-bk{background:none;border:1px solid var(--line);color:var(--smoke);font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;padding:12px 20px;border-radius:100px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em}
+.onb-nx{background:var(--ink);color:var(--sand);border:none;font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:500;padding:13px 26px;border-radius:100px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em}
+.onb-nx:hover{background:var(--terracotta)}
+.orev{background:var(--ink);color:var(--sand);border-radius:14px;padding:22px;margin-bottom:20px;background-image:radial-gradient(circle at 85% 0%,rgba(197,87,44,.26),transparent 55%)}
+.orev .orb{font-family:'Fraunces',serif;font-size:13px;font-weight:500;margin-bottom:10px}
+.orev .orb span{color:#e8b59a}
+.orev .orn{font-family:'Fraunces',serif;font-size:30px;font-weight:400;letter-spacing:-.03em;font-style:italic;color:#e8b59a;margin-bottom:3px}
+.orev .orl{font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.2em;color:#e8b59a;margin-bottom:20px}
+.orev .ort{display:flex;justify-content:space-between;padding-top:12px;border-top:1px solid rgba(232,181,154,.2);font-size:12px;color:rgba(242,234,212,.85)}
+</style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+<button class="mobile-nav-toggle" onclick="toggleMobileNav()">☰</button>
+<div class="toast" id="toast"><span class="ok">✓</span><span id="toast-msg">Saved</span></div>
+
+
+<!-- ══ OWNER AUTH SCREEN ══ -->
+<div id="owner-auth-screen">
+  <div class="owner-login-card">
+
+    <!-- LOGIN -->
+    <div id="owner-mode-login">
+      <div class="owner-login-logo">Rain<span>back</span> <span style="font-size:11px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)">for restaurants</span></div>
+      <h2 class="owner-auth-title">Owner <em>login.</em></h2>
+      <p class="owner-auth-sub">Sign in to manage your restaurant, members, and events.</p>
+      <div class="owner-auth-error" id="owner-login-error"></div>
+
+      <button class="owner-social-btn owner-social-apple" onclick="ownerSocialLogin('apple')">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.05 12.04c-.03-2.6 2.13-3.85 2.22-3.91-1.21-1.77-3.1-2.01-3.77-2.04-1.6-.16-3.13.94-3.94.94-.81 0-2.07-.92-3.4-.9-1.75.03-3.36 1.02-4.26 2.58-1.82 3.16-.46 7.84 1.3 10.41.86 1.26 1.89 2.67 3.24 2.62 1.3-.05 1.79-.84 3.36-.84s2.01.84 3.39.81c1.4-.02 2.29-1.28 3.15-2.55.99-1.46 1.4-2.87 1.42-2.94-.03-.01-2.73-1.05-2.76-4.16zM14.47 4.5c.72-.87 1.2-2.08 1.07-3.28-1.03.04-2.28.69-3.02 1.56-.66.77-1.24 2-1.08 3.18 1.15.09 2.32-.59 3.03-1.46z"/></svg>
+        Continue with Apple
+      </button>
+      <button class="owner-social-btn owner-social-google" onclick="ownerSocialLogin('google')">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="owner-auth-divider">or with email</div>
+
+      <input class="owner-auth-input" id="owner-login-email" type="email" placeholder="Email address" autocomplete="email"/>
+      <input class="owner-auth-input" id="owner-login-password" type="password" placeholder="Password" autocomplete="current-password"/>
+      <button class="owner-auth-btn" onclick="ownerLogin()">Log in →</button>
+      <div class="owner-auth-divider" style="margin-top:18px">new restaurant?</div>
+      <button class="owner-auth-btn" onclick="ownerSwitchMode('signup')" style="background:transparent;color:var(--ink);border:1.5px solid var(--ink)">Register your restaurant →</button>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="owner-mode-signup" style="display:none">
+      <div class="owner-login-logo">Rain<span>back</span> <span style="font-size:11px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)">for restaurants</span></div>
+      <h2 class="owner-auth-title">Register your <em>restaurant.</em></h2>
+      <p class="owner-auth-sub">Create your owner account. Next you'll set up your restaurant and perks.</p>
+      <div class="owner-auth-error" id="owner-signup-error"></div>
+      <div class="owner-name-row">
+        <input class="owner-auth-input" id="owner-signup-firstname" type="text" placeholder="First name"/>
+        <input class="owner-auth-input" id="owner-signup-lastname" type="text" placeholder="Last name"/>
+      </div>
+      <input class="owner-auth-input" id="owner-signup-email" type="email" placeholder="Email address"/>
+      <input class="owner-auth-input" id="owner-signup-password" type="password" placeholder="Create a password"/>
+      <label style="display:flex;align-items:flex-start;gap:9px;margin:4px 0 14px;font-size:12px;color:var(--ink-s);line-height:1.45;cursor:pointer">
+        <input type="checkbox" id="owner-signup-consent" style="margin-top:2px;flex-shrink:0;width:16px;height:16px;accent-color:var(--terracotta)"/>
+        <span>I agree to the <a href="#" onclick="event.preventDefault()" style="color:var(--terracotta);text-decoration:underline">Terms</a>, <a href="#" onclick="event.preventDefault()" style="color:var(--terracotta);text-decoration:underline">Privacy Policy</a>, and Restaurant Agreement (including the 5% fee).</span>
+      </label>
+      <button class="owner-auth-btn" onclick="ownerSignup()">Create account →</button>
+      <div class="owner-auth-toggle">Already registered? <a onclick="ownerSwitchMode('login')">Log in →</a></div>
+    </div>
+
+    <!-- OTP SEND -->
+    <div id="owner-mode-otp" style="display:none">
+      <div class="owner-login-logo">Rain<span>back</span></div>
+      <h2 class="owner-auth-title">Get a <em>login code.</em></h2>
+      <p class="owner-auth-sub">We'll email you a 6-digit code. No password needed.</p>
+      <div class="owner-auth-error" id="owner-otp-error"></div>
+      <input class="owner-auth-input" id="owner-otp-email" type="email" placeholder="Your email address"/>
+      <button class="owner-auth-btn" onclick="ownerSendOTP()">Send code →</button>
+      <div class="owner-auth-toggle"><a onclick="ownerSwitchMode('login')">← Back to login</a></div>
+    </div>
+
+    <!-- OTP VERIFY -->
+    <div id="owner-mode-otp-verify" style="display:none">
+      <div class="owner-login-logo">Rain<span>back</span></div>
+      <h2 class="owner-auth-title">Enter your <em>code.</em></h2>
+      <p class="owner-auth-sub" id="owner-otp-sent-to">Code sent to your email.</p>
+      <div class="owner-auth-error" id="owner-verify-error"></div>
+      <input class="owner-auth-input" id="owner-otp-code" type="number" placeholder="6-digit code" style="text-align:center;font-size:24px;letter-spacing:8px;font-family:'JetBrains Mono',monospace"/>
+      <button class="owner-auth-btn" onclick="ownerVerifyOTP()">Verify &amp; enter →</button>
+      <div class="owner-auth-toggle"><a onclick="ownerSwitchMode('otp')">Resend code →</a></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══ OWNER RESTAURANT ONBOARDING (4 steps → creates restaurant in DB) ══ -->
+<div id="owner-onboard">
+  <div class="onb-wrap">
+    <div class="onb-head">
+      <div class="onb-logo">Rain<span>back</span></div>
+      <div class="onb-prog" id="onb-prog">Step 1 of 4</div>
+    </div>
+    <div class="onb-bar"><div class="onb-fill" id="onb-fill"></div></div>
+
+    <!-- STEP 1 — restaurant -->
+    <div class="ostep on" id="ostep-1">
+      <h2 class="ostitle">About <em>your restaurant.</em></h2>
+      <p class="osub">This becomes your restaurant page. You can edit all of it later.</p>
+      <div class="of"><label>Restaurant name *</label><input type="text" id="onb-name" placeholder="Limoncello"/></div>
+      <div class="ofrow">
+        <div class="of"><label>Neighborhood</label><input type="text" id="onb-neighborhood" placeholder="South Beach"/></div>
+        <div class="of"><label>City *</label><input type="text" id="onb-city" placeholder="Miami Beach"/></div>
+      </div>
+      <div class="of"><label>Cuisine</label><input type="text" id="onb-cuisine" placeholder="Southern Italian · Pizzeria"/></div>
+      <div class="of"><label>Instagram</label><input type="text" id="onb-instagram" placeholder="@yourrestaurant"/></div>
+      <div class="of"><label>Address</label><input type="text" id="onb-address" placeholder="1334 Washington Ave"/></div>
+      <div class="of"><label>Your story (optional)</label><textarea id="onb-story" rows="3" placeholder="What makes your restaurant special…"></textarea></div>
+      <div class="onb-nav"><span></span><button class="onb-nx" onclick="onbNext(2)">Continue →</button></div>
+    </div>
+
+    <!-- STEP 2 — membership size + price -->
+    <div class="ostep" id="ostep-2">
+      <h2 class="ostitle">Design your <em>membership.</em></h2>
+      <p class="osub">Set how many memberships exist and the price. Scarcity is the point.</p>
+      <div class="of">
+        <label>Total memberships available</label>
+        <div class="osw">
+          <div class="osv"><strong id="onb-capv">200</strong><span>memberships · 1 year each</span></div>
+          <input type="range" id="onb-cap" min="50" max="500" step="10" value="200" oninput="document.getElementById('onb-capv').textContent=this.value"/>
+          <div style="display:flex;justify-content:space-between;margin-top:7px;font-family:'JetBrains Mono',monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke)"><span>50 — Intimate</span><span>500 — Open</span></div>
+        </div>
+      </div>
+      <div class="ofrow">
+        <div class="of"><label>Membership price (USD) *</label><input type="number" id="onb-price" value="150" min="10"/></div>
+        <div class="of"><label>Duration</label><select id="onb-duration"><option value="1 year">1 year</option><option value="6 months">6 months</option><option value="season">Season (3 months)</option></select></div>
+      </div>
+      <div class="of"><label>Tier name</label><input type="text" id="onb-tier" value="Founding Member"/></div>
+      <div class="onb-nav"><button class="onb-bk" onclick="onbNext(1)">← Back</button><button class="onb-nx" onclick="onbNext(3)">Choose perks →</button></div>
+    </div>
+
+    <!-- STEP 3 — perks -->
+    <div class="ostep" id="ostep-3">
+      <h2 class="ostitle">Choose the <em>perks.</em></h2>
+      <p class="osub">What do members get? Pick at least 3. You can change these anytime.</p>
+      <div class="oppgrid" id="onb-perks">
+        <div class="opp on" data-n="Priority weekend table" data-d="Guaranteed seating Fri–Sat" onclick="onbTogglePerk(this)"><div class="oppi"><strong>Priority weekend table</strong><span>Guaranteed seating Fri–Sat, up to 4 guests</span></div><div class="oppc">✓</div></div>
+        <div class="opp on" data-n="Members-only chef nights" data-d="Quarterly events with the kitchen team" onclick="onbTogglePerk(this)"><div class="oppi"><strong>Members-only chef nights</strong><span>Quarterly events with the kitchen team</span></div><div class="oppc">✓</div></div>
+        <div class="opp on" data-n="Early menu access" data-d="2 weeks before public launch" onclick="onbTogglePerk(this)"><div class="oppi"><strong>Early menu access</strong><span>2 weeks before public launch</span></div><div class="oppc">✓</div></div>
+        <div class="opp on" data-n="Vote on the menu" data-d="Monthly polls — members shape the restaurant" onclick="onbTogglePerk(this)"><div class="oppi"><strong>Vote on the menu</strong><span>Monthly polls — members shape the restaurant</span></div><div class="oppc">✓</div></div>
+        <div class="opp" data-n="Welcome drink on arrival" data-d="A glass on the house, every visit" onclick="onbTogglePerk(this)"><div class="oppi"><strong>Welcome drink on arrival</strong><span>A glass on the house, every visit</span></div><div class="oppc"></div></div>
+        <div class="opp" data-n="+1 guest at all events" data-d="Members always bring a friend" onclick="onbTogglePerk(this)"><div class="oppi"><strong>+1 guest at all events</strong><span>Members always bring a friend</span></div><div class="oppc"></div></div>
+        <div class="opp" data-n="Members-only wine list" data-d="Bottles not available to the public" onclick="onbTogglePerk(this)"><div class="oppi"><strong>Members-only wine list</strong><span>Bottles not available to the public</span></div><div class="oppc"></div></div>
+      </div>
+      <div class="of" style="margin-top:14px"><label>Custom perk (optional)</label><input type="text" id="onb-custom-perk" placeholder="e.g. Monthly tasting, chef's table access…"/></div>
+      <div class="onb-nav"><button class="onb-bk" onclick="onbNext(2)">← Back</button><button class="onb-nx" onclick="onbNext(4)">Review →</button></div>
+    </div>
+
+    <!-- STEP 4 — review + create -->
+    <div class="ostep" id="ostep-4">
+      <h2 class="ostitle">Your club, <em>ready.</em></h2>
+      <p class="osub">Review and create. Your restaurant page goes live immediately.</p>
+      <div class="orev">
+        <div class="orb">Rain<span>back</span></div>
+        <div class="orn" id="onb-rev-name">Your restaurant</div>
+        <div class="orl" id="onb-rev-loc">Neighborhood · City</div>
+        <div class="ort"><span id="onb-rev-price">$150 / year</span><span id="onb-rev-cap">№ 001 / 200</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:6px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--smoke);margin-bottom:8px">Perks selected</div>
+        <div id="onb-rev-perks" style="font-size:13px;color:var(--ink);line-height:1.9"></div>
+      </div>
+      <div class="onb-nav"><button class="onb-bk" onclick="onbNext(3)">← Back</button><button class="onb-nx" id="onb-create-btn" onclick="onbCreateRestaurant()">Create my restaurant →</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">Rain<span>back</span></div>
+    <!-- Populated from API: restaurant name + city -->
+    <div class="sidebar-restaurant" id="sidebar-restaurant">—</div>
+
+    <div class="sidebar-section">Daily</div>
+    <button class="sidebar-link active" onclick="navigate('dashboard',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="sidebar-link" onclick="navigate('tonight',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      Tonight
+    </button>
+    <button class="sidebar-link" onclick="navigate('members',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Members
+    </button>
+    <button class="sidebar-link" onclick="navigate('scan',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+      Scan member
+    </button>
+    <button class="sidebar-link" onclick="navigate('activity',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Activity
+    </button>
+
+    <div class="sidebar-section">Engage</div>
+    <button class="sidebar-link" onclick="navigate('events',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Events
+    </button>
+    <button class="sidebar-link" onclick="navigate('votes',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+      Votes & feedback
+    </button>
+    <button class="sidebar-link" onclick="navigate('notes',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Notes to members
+    </button>
+
+    <div class="sidebar-section">Setup</div>
+    <button class="sidebar-link" onclick="navigate('terms',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Membership terms
+    </button>
+    <button class="sidebar-link" onclick="navigate('perks',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Perks
+    </button>
+    <button class="sidebar-link" onclick="navigate('menu',this)">
+      <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h12"/><circle cx="19" cy="17" r="2"/></svg>
+      Menu & nutrition
+    </button>
+
+    <!-- Populated from API: owner name + role -->
+    <div class="sidebar-foot">
+      <div class="sidebar-avatar" id="sidebar-avatar">—</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebar-owner-name">—</div>
+        <div class="sidebar-user-role" id="sidebar-owner-role">Owner</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+
+    <!-- ───── DASHBOARD ───── -->
+    <div class="view active" id="view-dashboard">
+      <div class="main-header">
+        <div>
+          <div class="main-eyebrow" id="dash-date">—</div>
+          <h1 class="main-title">Good morning, <em id="dash-owner-name">—</em></h1>
+          <p class="main-sub" id="dash-sub">—</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="showToast('Link copied ✓')">Share link</button>
+          <button class="btn btn-primary" onclick="openOverlay('overlay-event')">+ New event</button>
+        </div>
+      </div>
+
+      <!-- Bank account / payouts banner — shown until Stripe Connect is done -->
+      <div id="payout-banner" style="display:none;background:linear-gradient(135deg,#2A1F17,#3d2a1c);color:#F2EADC;border-radius:16px;padding:20px 22px;margin-bottom:22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+        <div style="width:46px;height:46px;border-radius:12px;background:rgba(232,181,154,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">🏦</div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:500;margin-bottom:3px">Add your bank account to get paid</div>
+          <div style="font-size:13px;color:rgba(242,234,212,.7);line-height:1.5">Members can't join until your payouts are set up. This is where your membership money lands — securely handled by Stripe. Takes 3 minutes.</div>
+        </div>
+        <button class="btn btn-primary" id="payout-btn" onclick="setupPayouts()" style="background:#C5572C;flex-shrink:0">Set up payouts →</button>
+      </div>
+
+      <!-- Confirmation once payouts are live -->
+      <div id="payout-done" style="display:none;background:rgba(107,122,79,.12);border:1px solid rgba(107,122,79,.3);color:#4E5C37;border-radius:12px;padding:13px 18px;margin-bottom:22px;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">✓</span> <span>Payouts active — your membership money lands directly in your bank account. <a onclick="setupPayouts()" style="color:#4E5C37;text-decoration:underline;cursor:pointer">Manage</a></span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card dark">
+          <div class="kpi-label">Cash this month</div>
+          <div class="kpi-value" id="kpi-cash">—</div>
+          <div class="kpi-trend up" id="kpi-cash-trend">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Year to date</div>
+          <div class="kpi-value" id="kpi-ytd">—</div>
+          <div class="kpi-trend up" id="kpi-ytd-trend">—</div>
+        </div>
+        <div class="kpi-card olive-tint">
+          <div class="kpi-label">Visits this month</div>
+          <div class="kpi-value" id="kpi-visits">—</div>
+          <div class="kpi-trend up" id="kpi-visits-trend">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg member visits</div>
+          <div class="kpi-value" id="kpi-avg-visits">—</div>
+          <div class="kpi-trend" id="kpi-avg-trend">per month</div>
+        </div>
+      </div>
+
+      <!-- Membership progress — populated from API -->
+      <div class="progress-card">
+        <div class="progress-header">
+          <div>
+            <div class="progress-title">Memberships sold</div>
+            <div class="progress-fraction">
+              <span id="prog-sold">—</span>
+              <span> of <span id="prog-cap">—</span></span>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="progress-pct" id="prog-pct">—</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--smoke);margin-top:4px" id="prog-remaining">—</div>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+        <div class="progress-meta">
+          <span id="prog-meta-left">—</span>
+          <span id="prog-meta-right">—</span>
+        </div>
+      </div>
+
+      <!-- Tonight + Votes panels -->
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title" id="dash-tonight-title">Tonight · —</div>
+            <button class="panel-action" onclick="navigate('tonight',findLink('tonight'))">Full list →</button>
+          </div>
+          <div id="dash-tonight-list">
+            <!-- Populated from API: tonight's reservations -->
+            <div style="padding:20px 0;text-align:center;font-size:13px;color:var(--smoke)">No reservations yet tonight</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Active vote</div>
+            <button class="panel-action" onclick="navigate('votes',findLink('votes'))">Manage →</button>
+          </div>
+          <div id="dash-vote-panel">
+            <!-- Populated from API: current active vote -->
+            <div style="padding:20px 0;text-align:center;font-size:13px;color:var(--smoke)">No active votes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart + Activity panels -->
+      <div class="two-col">
+        <div class="chart-card">
+          <div class="panel-header" style="margin-bottom:8px">
+            <div class="panel-title">Memberships sold · 30 days</div>
+            <button class="panel-action">All time →</button>
+          </div>
+          <!-- Chart rendered by JS from API data: GET /api/restaurant/sales-chart -->
+          <svg class="chart-svg" id="dash-chart" viewBox="0 0 600 200">
+            <text x="300" y="105" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#8E7D6B" text-transform="uppercase" letter-spacing="2">Connect API to render chart</text>
+          </svg>
+          <div class="chart-x-labels"><span>30d ago</span><span>2 weeks</span><span>1 week</span><span>Today</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Activity</div>
+            <button class="panel-action" onclick="navigate('activity',findLink('activity'))">All →</button>
+          </div>
+          <div id="dash-activity-list">
+            <!-- Populated from API: recent activity feed -->
+            <div style="padding:20px 0;text-align:center;font-size:13px;color:var(--smoke)">No activity yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu summary panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Your menu · <span style="color:var(--smoke);font-weight:400" id="dash-menu-count">— dishes</span></div>
+            <div style="font-size:12px;color:var(--smoke);margin-top:4px">Members see macros estimated by AI or precise weights</div>
+          </div>
+          <button class="panel-action" onclick="navigate('menu',findLink('menu'))">Manage menu →</button>
+        </div>
+        <div class="menu-summary-grid">
+          <div class="menu-summary-tile"><div class="mst-label">Avg calories</div><div class="mst-value" id="dash-avg-kcal">—</div><div class="mst-sub">across all dishes</div></div>
+          <div class="menu-summary-tile"><div class="mst-label">AI estimated</div><div class="mst-value" id="dash-ai-count">—</div><div class="mst-sub">dishes</div></div>
+          <div class="menu-summary-tile"><div class="mst-label">Precise</div><div class="mst-value" id="dash-precise-count">—</div><div class="mst-sub">dishes</div></div>
+          <div class="menu-summary-tile"><div class="mst-label">Member views</div><div class="mst-value" id="dash-menu-views">—</div><div class="mst-sub">this week</div></div>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line)">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--smoke);margin-bottom:12px">Top viewed this week</div>
+          <div id="dash-menu-top-list">
+            <!-- Populated from API: top 3 dishes by member views -->
+            <div style="padding:10px 0;font-size:13px;color:var(--smoke)">Add dishes in Menu & nutrition to see top performers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── TONIGHT ───── -->
+    <div class="view" id="view-tonight">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div>
+          <div class="main-eyebrow" id="tonight-eyebrow">—</div>
+          <h1 class="main-title">Tonight's <em>table</em></h1>
+          <p class="main-sub" id="tonight-sub">—</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="showToast('Floor sheet printed ✓')">Print floor sheet</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Reservations</div>
+          <button class="panel-action" onclick="showToast('Scanner ready')">Scan mode</button>
+        </div>
+        <div id="tonight-reservations-list">
+          <!-- Populated from API: GET /api/restaurant/tonight -->
+          <div class="empty-view" style="padding:40px 0">
+            <div class="ei">🕯️</div>
+            <h3>No reservations <em>yet</em></h3>
+            <p>Member reservations for tonight will appear here when they RSVP or book through the app.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── MEMBERS ───── -->
+    <div class="view" id="view-members">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div>
+          <h1 class="main-title">Your <em>members</em></h1>
+          <p class="main-sub" id="members-sub">—</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="showToast('Exported ✓')">Export CSV</button>
+          <button class="btn btn-primary">+ Invite members</button>
+        </div>
+      </div>
+      <div class="members-toolbar">
+        <input class="search-box" id="member-search" type="text" placeholder="Search by name, number, or email…" oninput="renderMembers('all',this.value)"/>
+        <button class="filter-pill active" onclick="filterPill(this,'all')">All</button>
+        <button class="filter-pill" onclick="filterPill(this,'founding')">Founders</button>
+        <button class="filter-pill" onclick="filterPill(this,'standard')">Members</button>
+        <button class="filter-pill" onclick="filterPill(this,'renewing')">Up for renewal</button>
+      </div>
+      <div class="members-table" id="members-table">
+        <!-- Populated from API: GET /api/restaurant/members -->
+        <div class="table-row head">
+          <div>№</div><div>Member</div><div>Tier</div><div>Visits</div><div>Joined</div><div>Status</div>
+        </div>
+        <div class="empty-view" style="padding:48px 0">
+          <div class="ei">👥</div>
+          <h3>No members <em>yet</em></h3>
+          <p>Once your membership goes live and someone joins, they'll appear here — named, numbered, and tracked.</p>
+          <button class="btn btn-primary" onclick="showToast('Membership link copied ✓')">Share membership link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── ACTIVITY ───── -->
+    <div class="view" id="view-activity">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div><h1 class="main-title">All <em>activity</em></h1><p class="main-sub">Complete log of member actions</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="filter-pill active" onclick="filterPill(this)">All</button>
+          <button class="filter-pill" onclick="filterPill(this)">Joins</button>
+          <button class="filter-pill" onclick="filterPill(this)">Visits</button>
+          <button class="filter-pill" onclick="filterPill(this)">Events</button>
+          <button class="filter-pill" onclick="filterPill(this)">Perks</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div id="activity-feed">
+          <!-- Populated from API: GET /api/restaurant/activity -->
+          <div class="empty-view" style="padding:40px 0">
+            <div class="ei">⚡</div>
+            <h3>No activity <em>yet</em></h3>
+            <p>Every join, visit, RSVP, and perk redemption will appear here in real time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── EVENTS ───── -->
+    <div class="view" id="view-events">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div><h1 class="main-title">Member <em>events</em></h1><p class="main-sub" id="events-sub">—</p></div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openOverlay('overlay-event')">+ Create event</button>
+        </div>
+      </div>
+      <div id="events-list">
+        <!-- Populated from API: GET /api/restaurant/events -->
+        <div class="empty-view">
+          <div class="ei">📅</div>
+          <h3>No events <em>yet</em></h3>
+          <p>Create your first members-only event — a chef's night, a wine tasting, a preview evening. It goes straight to their feed.</p>
+          <button class="btn btn-primary" onclick="openOverlay('overlay-event')">Create first event →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── VOTES ───── -->
+    <div class="view" id="view-votes">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div><h1 class="main-title">Votes & <em>feedback</em></h1><p class="main-sub" id="votes-sub">—</p></div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openOverlay('overlay-vote')">+ Create vote</button>
+        </div>
+      </div>
+      <div id="votes-list">
+        <!-- Populated from API: GET /api/restaurant/votes -->
+        <div class="empty-view">
+          <div class="ei">🗳️</div>
+          <h3>No votes <em>yet</em></h3>
+          <p>Ask your members what goes on the next menu. Which wine list. Which event. They vote — you decide. It builds the community.</p>
+          <button class="btn btn-primary" onclick="openOverlay('overlay-vote')">Create first vote →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── NOTES ───── -->
+    <!-- ══ SCAN MEMBER (staff scans member's QR at the door) ══ -->
+    <div class="view" id="view-scan">
+      <div class="main-header">
+        <div>
+          <div class="main-eyebrow">At the door</div>
+          <h1 class="main-title">Scan a <em>member.</em></h1>
+          <p class="main-sub">Point the camera at a member's entry QR to check them in and see their perks.</p>
+        </div>
+      </div>
+
+      <div style="max-width:480px">
+        <div id="scan-start-card" style="background:var(--sand-w);border:1px solid var(--line);border-radius:16px;padding:30px;text-align:center">
+          <div style="font-size:40px;margin-bottom:12px">📷</div>
+          <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:500;margin-bottom:6px">Ready to scan</div>
+          <p style="font-size:13px;color:var(--smoke);line-height:1.5;margin-bottom:20px">Tap below and allow camera access. Hold the member's phone QR in the frame.</p>
+          <button class="btn btn-primary" onclick="startScanner()">Start scanning →</button>
+        </div>
+
+        <div id="scan-reader" style="display:none;border-radius:16px;overflow:hidden;border:1px solid var(--line)"></div>
+        <button id="scan-stop" style="display:none;margin-top:12px;width:100%;background:none;border:1px solid var(--line-s);color:var(--ink-s);font-family:inherit;font-size:13px;padding:11px;border-radius:100px;cursor:pointer" onclick="stopScanner()">Stop scanning</button>
+
+        <!-- Result card -->
+        <div id="scan-result" style="display:none;margin-top:18px;background:var(--ink);color:var(--sand);border-radius:16px;padding:24px">
+          <div id="scan-result-body"></div>
+        </div>
+
+        <div style="margin-top:20px;background:rgba(107,122,79,.08);border-left:3px solid var(--olive);border-radius:0 8px 8px 0;padding:13px 16px">
+          <p style="font-size:12.5px;color:var(--ink-s);line-height:1.5">No POS integration needed. You scan, you see who they are and their perks, you apply the perk on your own system. Works with any setup.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="view-notes">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div><h1 class="main-title">Notes to <em>members</em></h1><p class="main-sub">Sent as push notifications · delivered to their wallet pass</p></div>
+      </div>
+      <div class="compose-grid">
+        <div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">New note</div></div>
+            <div class="form-section">
+              <label class="form-label">Title</label>
+              <input class="form-input" id="note-title" type="text" placeholder="e.g. A new wine just arrived…" oninput="updateNotePreview()"/>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Message</label>
+              <textarea class="form-textarea" id="note-body" rows="4" placeholder="Write something personal. They'll read notes from someone they trust." oninput="updateNotePreview()"></textarea>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Send to</label>
+              <select class="form-select">
+                <option>All members (—)</option>
+                <option>Founding members only</option>
+                <option>Members inactive 30+ days</option>
+              </select>
+              <p class="form-helper">Member count updates once memberships are live</p>
+            </div>
+            <button class="btn btn-primary" id="note-send-btn" style="width:100%" onclick="submitNote()">Send note</button>
+          </div>
+          <div style="margin-top:20px">
+            <h3 style="font-family:'Fraunces',serif;font-size:20px;font-weight:500;letter-spacing:-.02em;margin-bottom:14px">Sent notes</h3>
+            <div id="notes-history-list">
+              <!-- Populated from API: GET /api/restaurant/notes -->
+              <div style="padding:24px;background:var(--sand-warm);border:1px solid var(--line);border-radius:14px;text-align:center;font-size:13px;color:var(--smoke)">No notes sent yet</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="preview-phone">
+            <div class="preview-screen">
+              <div class="preview-notch"></div>
+              <div class="preview-notification">
+                <div class="preview-notif-header">
+                  <div class="preview-notif-icon" id="preview-notif-icon">R</div>
+                  <div class="preview-notif-app">Rainback</div>
+                  <div class="preview-notif-time">now</div>
+                </div>
+                <div class="preview-notif-title" id="preview-title">Your note title</div>
+                <div class="preview-notif-body" id="preview-body">Your message appears here…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── TERMS ───── -->
+    <div class="view" id="view-terms">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div><h1 class="main-title">Membership <em>terms</em></h1><p class="main-sub">Edit anytime · changes apply to new members only</p></div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="showToast('Terms saved ✓')">Save changes</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="form-section">
+          <label class="form-label">Restaurant name (public)</label>
+          <!-- Populated from API: GET /api/restaurant/profile -->
+          <input class="form-input" id="terms-name" type="text" placeholder="—"/>
+        </div>
+        <div class="form-row">
+          <div class="form-section">
+            <label class="form-label">Neighborhood</label>
+            <input class="form-input" id="terms-neighborhood" type="text" placeholder="—"/>
+          </div>
+          <div class="form-section">
+            <label class="form-label">City</label>
+            <input class="form-input" id="terms-city" type="text" placeholder="—"/>
+          </div>
+        </div>
+        <div class="form-section">
+          <label class="form-label">Total memberships (cap)</label>
+          <input class="form-input" id="terms-cap" type="number" placeholder="e.g. 200"/>
+          <p class="form-helper">You can increase this later. You cannot reduce it once memberships are sold.</p>
+        </div>
+        <div class="form-row">
+          <div class="form-section">
+            <label class="form-label">Price per membership</label>
+            <input class="form-input" id="terms-price" type="text" placeholder="$150"/>
+            <p class="form-helper">You keep 100%. 5% fee added at checkout for the member.</p>
+          </div>
+          <div class="form-section">
+            <label class="form-label">Duration</label>
+            <select class="form-select" id="terms-duration">
+              <option>1 year (standard)</option>
+              <option>6 months</option>
+              <option>Season (3 months)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── PERKS ───── -->
+    <div class="view" id="view-perks">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div><h1 class="main-title">Member <em>perks</em></h1><p class="main-sub" id="perks-sub">—</p></div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="savePerks()" id="perks-save-btn">Save perks</button>
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--smoke);margin-bottom:18px;max-width:600px">Tap to turn a perk on or off for your members. The ones you picked when you registered are already on. Add your own at the bottom.</p>
+      <div class="perks-gallery" id="perks-gallery">
+        <!-- Populated by loadPerks() -->
+      </div>
+      <div style="margin-top:24px;max-width:600px">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--smoke);display:block;margin-bottom:8px">Add your own perk</label>
+        <div style="display:flex;gap:10px">
+          <input class="form-input" id="custom-perk-input" type="text" placeholder="e.g. Birthday bottle of champagne" style="flex:1"/>
+          <button class="btn btn-secondary" onclick="addCustomPerk()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───── MENU & NUTRITION ───── -->
+    <div class="view" id="view-menu">
+      <button class="back-btn" onclick="navigate('dashboard',findLink('dashboard'))">Back to dashboard</button>
+      <div class="main-header">
+        <div>
+          <div class="main-eyebrow">Menu & Nutrition</div>
+          <h1 class="main-title">Your <em>menu</em></h1>
+          <p class="main-sub">Add dishes once. Members see them with macronutrient estimates.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="showToast('Exported ✓')">Export</button>
+          <button class="btn btn-primary" onclick="openOverlay('overlay-add-dish');resetDishForm()">+ Add dish</button>
+        </div>
+      </div>
+      <div class="menu-mode-info">
+        <span class="icon">✦</span>
+        <div><strong>Two ways to add dishes.</strong> Use AI mode for speed — just type the name and ingredients. Use Precise mode when you want exact numbers — enter gram weights per ingredient.</div>
+      </div>
+      <!-- KPIs — populated from API -->
+      <div class="kpi-grid" style="margin-bottom:24px">
+        <div class="kpi-card"><div class="kpi-label">Total dishes</div><div class="kpi-value" id="menu-kpi-dishes">—</div><div class="kpi-trend" id="menu-kpi-mode">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Avg calories</div><div class="kpi-value" id="menu-kpi-kcal">—</div><div class="kpi-trend">per dish</div></div>
+        <div class="kpi-card olive-tint"><div class="kpi-label">Member views</div><div class="kpi-value" id="menu-kpi-views">—</div><div class="kpi-trend up" id="menu-kpi-views-trend">—</div></div>
+        <div class="kpi-card aubergine"><div class="kpi-label">AI accuracy</div><div class="kpi-value">±12%</div><div class="kpi-trend">macro estimate</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Your dishes</div>
+          <div style="display:flex;gap:8px">
+            <button class="filter-pill active" onclick="filterMenu(this,'all')">All</button>
+            <button class="filter-pill" onclick="filterMenu(this,'starters')">Starters</button>
+            <button class="filter-pill" onclick="filterMenu(this,'mains')">Mains</button>
+            <button class="filter-pill" onclick="filterMenu(this,'desserts')">Desserts</button>
+          </div>
+        </div>
+        <div id="menu-dish-list">
+          <!-- Populated from API: GET /api/restaurant/menu -->
+          <div class="empty-view" style="padding:40px 0">
+            <div class="ei">🍽️</div>
+            <h3>No dishes <em>yet</em></h3>
+            <p>Add your first dish — members will see it in the app with macronutrient estimates.</p>
+            <button class="btn btn-primary" onclick="openOverlay('overlay-add-dish');resetDishForm()">Add first dish →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.main -->
+</div><!-- /.app -->
+
+<!-- ═══ OVERLAYS ═══ -->
+
+<!-- Add Dish -->
+<div class="overlay" id="overlay-add-dish">
+  <div class="overlay-card" style="max-width:620px">
+    <button class="overlay-close" onclick="closeOverlay('overlay-add-dish')">×</button>
+    <div style="margin-bottom:24px">
+      <div class="main-eyebrow" style="margin-bottom:6px">Add a dish</div>
+      <h2 style="font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.02em">Tell us about <em style="font-style:italic;color:var(--terracotta)">your dish.</em></h2>
+    </div>
+    <div class="menu-mode-toggle">
+      <button class="on" id="mode-ai-btn" onclick="setDishMode('ai')">✦ AI mode <span style="font-size:9px;font-family:'JetBrains Mono',monospace;background:var(--aubergine-tint);color:var(--aubergine);padding:2px 6px;border-radius:2px;margin-left:4px">Fastest</span></button>
+      <button id="mode-precise-btn" onclick="setDishMode('precise')">⊙ Precise mode <span style="font-size:9px;font-family:'JetBrains Mono',monospace;background:var(--ochre-tint);color:var(--ochre);padding:2px 6px;border-radius:2px;margin-left:4px">Accurate</span></button>
+    </div>
+    <div class="add-dish-form">
+      <div class="form-section"><label class="form-label">Dish name</label><input class="form-input" type="text" id="dish-name-input" placeholder="e.g. Charred octopus, fava, dill"/></div>
+      <div class="form-row-2">
+        <div class="form-section"><label class="form-label">Category</label><select class="form-select" id="dish-category"><option>Starter</option><option>Main</option><option>Side</option><option>Dessert</option><option>Drink</option></select></div>
+        <div class="form-section"><label class="form-label">Price (optional)</label><input class="form-input" type="text" placeholder="$24"/></div>
+      </div>
+      <div class="form-section"><label class="form-label">Description</label><textarea class="form-input" rows="2" placeholder="A short, evocative description members will see"></textarea></div>
+      <!-- AI mode -->
+      <div id="dish-mode-ai">
+        <div class="form-section">
+          <label class="form-label">Ingredients <span style="color:var(--smoke);text-transform:none;letter-spacing:0;font-weight:400;font-family:'Inter Tight',sans-serif;font-size:12px">— type names, AI estimates portions</span></label>
+          <textarea class="form-input" rows="3" id="ai-ingredients" placeholder="e.g. octopus, fava beans, dill, lemon, olive oil"></textarea>
+        </div>
+        <div class="form-section"><label class="form-label">Serving size</label>
+          <select class="form-select" id="ai-portion" onchange="estimateAIMacros()">
+            <option value="small">Small / starter (180–220g)</option>
+            <option value="medium" selected>Medium (250–320g)</option>
+            <option value="large">Main course (350–450g)</option>
+            <option value="shared">Shared (500g+)</option>
+          </select>
+        </div>
+        <div class="live-macros"><div class="live-macros-label">✦ AI estimate</div><div class="live-macros-grid"><div class="live-macro"><div class="v" id="ai-kcal">—</div><div class="l">kcal</div></div><div class="live-macro"><div class="v" id="ai-protein">—</div><div class="l">Protein</div></div><div class="live-macro"><div class="v" id="ai-fat">—</div><div class="l">Fat</div></div><div class="live-macro"><div class="v" id="ai-carbs">—</div><div class="l">Carbs</div></div></div></div>
+      </div>
+      <!-- Precise mode -->
+      <div id="dish-mode-precise" style="display:none">
+        <div class="form-section">
+          <label class="form-label">Ingredients <span style="color:var(--smoke);text-transform:none;letter-spacing:0;font-weight:400;font-family:'Inter Tight',sans-serif;font-size:12px">— enter exact gram weight per serving</span></label>
+          <div id="precise-ingredients">
+            <div class="ingredient-row"><input type="text" placeholder="Ingredient" oninput="recalculatePrecise()"/><input type="number" placeholder="grams" oninput="recalculatePrecise()"/><button class="remove-btn" onclick="removeIngredient(this)">×</button></div>
+            <div class="ingredient-row"><input type="text" placeholder="Ingredient" oninput="recalculatePrecise()"/><input type="number" placeholder="grams" oninput="recalculatePrecise()"/><button class="remove-btn" onclick="removeIngredient(this)">×</button></div>
+          </div>
+          <button class="add-ingredient-btn" onclick="addIngredientRow()">+ Add ingredient</button>
+        </div>
+        <div class="live-macros"><div class="live-macros-label">⊙ Calculated from <span id="ingredient-count">0</span> ingredients</div><div class="live-macros-grid"><div class="live-macro"><div class="v" id="pr-kcal">0</div><div class="l">kcal</div></div><div class="live-macro"><div class="v" id="pr-protein">0g</div><div class="l">Protein</div></div><div class="live-macro"><div class="v" id="pr-fat">0g</div><div class="l">Fat</div></div><div class="live-macro"><div class="v" id="pr-carbs">0g</div><div class="l">Carbs</div></div></div></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-primary" onclick="saveDish()">Save dish</button>
+        <button class="btn btn-secondary" onclick="closeOverlay('overlay-add-dish')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Event -->
+<div class="overlay" id="overlay-event">
+  <div class="overlay-card">
+    <button class="overlay-close" onclick="closeOverlay('overlay-event')">×</button>
+    <div class="main-eyebrow" style="margin-bottom:6px">New event</div>
+    <h2 style="font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.02em;margin-bottom:24px">Create an <em style="font-style:italic;color:var(--terracotta)">event.</em></h2>
+    <div class="form-section"><label class="form-label">Event title</label><input class="form-input" id="event-title" type="text" placeholder="Chef's pasta night…"/></div>
+    <div class="form-row">
+      <div class="form-section"><label class="form-label">Date</label><input class="form-input" id="event-date" type="date"/></div>
+      <div class="form-section"><label class="form-label">Time</label><input class="form-input" id="event-time" type="time" value="19:00"/></div>
+    </div>
+    <div class="form-section"><label class="form-label">Max seats</label><input class="form-input" id="event-capacity" type="number" value="20" min="1" max="500"/></div>
+    <div class="form-section"><label class="form-label">Description</label><textarea class="form-textarea" id="event-desc" placeholder="Tell your members what makes this night special…"></textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeOverlay('overlay-event')">Cancel</button>
+      <button class="btn btn-primary" id="event-submit-btn" onclick="submitEvent()">Create event →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Vote -->
+<div class="overlay" id="overlay-vote">
+  <div class="overlay-card">
+    <button class="overlay-close" onclick="closeOverlay('overlay-vote')">×</button>
+    <div class="main-eyebrow" style="margin-bottom:6px">New vote</div>
+    <h2 style="font-family:'Fraunces',serif;font-size:28px;font-weight:400;letter-spacing:-.02em;margin-bottom:24px">Ask your <em style="font-style:italic;color:var(--terracotta)">members.</em></h2>
+    <div class="form-section"><label class="form-label">Question</label><input class="form-input" id="vote-question" type="text" placeholder="What should we add to the summer menu?"/></div>
+    <div class="form-section"><label class="form-label">Option 1</label><input class="form-input" id="vote-opt1" type="text" placeholder="First option…"/></div>
+    <div class="form-section"><label class="form-label">Option 2</label><input class="form-input" id="vote-opt2" type="text" placeholder="Second option…"/></div>
+    <div class="form-section"><label class="form-label">Option 3 (optional)</label><input class="form-input" id="vote-opt3" type="text" placeholder="Third option…"/></div>
+    <div class="form-section">
+      <label class="form-label">Closes after</label>
+      <select class="form-select" id="vote-closes"><option value="1">24 hours</option><option value="3">3 days</option><option value="7" selected>7 days</option><option value="14">14 days</option></select>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeOverlay('overlay-vote')">Cancel</button>
+      <button class="btn btn-primary" id="vote-submit-btn" onclick="submitVote()">Start vote →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Member detail -->
+<div class="overlay" id="overlay-member">
+  <div class="overlay-card">
+    <button class="overlay-close" onclick="closeOverlay('overlay-member')">×</button>
+    <div class="member-profile-card">
+      <div class="profile-header">
+        <div><div class="profile-brand">Rain<span>back</span></div></div>
+        <div class="profile-tier" id="overlay-member-tier">Member</div>
+      </div>
+      <div class="profile-name" id="overlay-member-name">—</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--terracotta-soft);margin-top:4px" id="overlay-member-restaurant">—</div>
+      <div class="profile-foot">
+        <div><small>Joined</small><div class="joined" id="overlay-member-joined">—</div></div>
+        <div class="profile-serial" id="overlay-member-serial">—</div>
+      </div>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-tile"><div class="stat-label">Visits</div><div class="stat-value" id="overlay-member-visits">—</div></div>
+      <div class="stat-tile"><div class="stat-label">Perks used</div><div class="stat-value" id="overlay-member-perks">—</div></div>
+      <div class="stat-tile"><div class="stat-label">Renews</div><div class="stat-value" id="overlay-member-renews">—</div></div>
+    </div>
+    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:500;letter-spacing:-.015em;margin-bottom:12px">Recent visits</div>
+    <div id="overlay-member-visits-list">
+      <!-- Populated from API: GET /api/restaurant/members/:id -->
+    </div>
+    <div class="profile-actions" style="margin-top:18px">
+      <button class="btn btn-secondary" onclick="showToast('Message sent ✓');closeOverlay('overlay-member')">Send note</button>
+      <button class="btn btn-primary" onclick="closeOverlay('overlay-member')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────
+// RAINBACK OWNER DASHBOARD — SHELL
+// All functions are production-ready render hooks.
+// Replace TODO comments with real API calls.
+// ─────────────────────────────────────────────────────
+
+// ── NAVIGATION ──
+function navigate(viewId, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const view = document.getElementById('view-' + viewId);
+  if (view) view.classList.add('active');
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (window.innerWidth <= 900) document.getElementById('sidebar').classList.remove('open');
+  // Scroll to top — instant, and cover every possible scroll container
+  const toTop = () => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const main = document.querySelector('.main');
+    if (main) main.scrollTop = 0;
+    if (view) view.scrollTop = 0;
+  };
+  toTop();
+  // Run again after the view renders (layout can shift the page back down)
+  requestAnimationFrame(toTop);
+  setTimeout(toTop, 60);
+  // Load view-specific data
+  if (viewId === 'dashboard') loadDashboard();
+  if (viewId === 'tonight')   loadTonight();
+  if (viewId === 'members')   loadMembers();
+  if (viewId === 'activity')  loadActivity();
+  if (viewId === 'events')    loadEvents();
+  if (viewId === 'votes')     loadVotes();
+  if (viewId === 'notes')     loadNotes();
+  if (viewId === 'terms')     loadTerms();
+  if (viewId === 'perks')     loadPerks();
+  if (viewId === 'menu')      loadMenu();
+  if (viewId === 'scan')      resetScanUI();
+  // Stop the camera when navigating away from the scanner
+  if (viewId !== 'scan' && typeof stopScanner === 'function' && html5QrScanner) stopScanner();
+}
+
+function findLink(viewId) {
+  const links = document.querySelectorAll('.sidebar-link');
+  for (let l of links) {
+    if (l.getAttribute('onclick') && l.getAttribute('onclick').includes("'" + viewId + "'")) return l;
+  }
+  return null;
+}
+
+function toggleMobileNav() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// RAINBACK OWNER DASHBOARD — API CONNECTION
+// ═══════════════════════════════════════════════════════
+
+const API = 'https://rainback-backend-production.up.railway.app';
+let TOKEN = localStorage.getItem('rb_owner_token') || null;
+let RESTAURANT_ID = localStorage.getItem('rb_restaurant_id') || null;
+
+async function api(path, opts = {}) {
+  const hasBody = !!opts.body;
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: {
+      ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
+      ...(TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+      ...opts.headers,
+    },
+    body: hasBody ? JSON.stringify(opts.body) : undefined,
+  });
+  if (res.status === 401) { TOKEN = null; localStorage.removeItem('rb_owner_token'); return null; }
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || 'Request failed'); }
+  return res.json();
+}
+
+// ── AUTH HELPERS ──
+function ownerSwitchMode(mode) {
+  ['login','signup','otp','otp-verify'].forEach(m => {
+    const el = document.getElementById('owner-mode-' + m);
+    if (el) el.style.display = m === mode ? 'block' : 'none';
+  });
+  ['owner-login-error','owner-signup-error','owner-otp-error','owner-verify-error'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.classList.remove('show'); }
+  });
+}
+function ownerAuthError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function showOwnerAuth() {
+  const s = document.getElementById('owner-auth-screen');
+  if (s) s.style.display = 'flex';
+}
+function hideOwnerAuth() {
+  const s = document.getElementById('owner-auth-screen');
+  if (s) s.style.display = 'none';
+}
+
+async function ownerSocialLogin(provider) {
+  try {
+    const res = await fetch(API + '/api/auth/' + provider, { method: 'GET' });
+    if (res.ok) { const d = await res.json(); if (d.redirectUrl) { window.location.href = d.redirectUrl; return; } }
+  } catch (e) { /* not configured yet */ }
+  ownerAuthError('owner-login-error', (provider === 'apple' ? 'Apple' : 'Google') + ' sign-in is being switched on. For now, use your email below.');
+}
+
+// ── RESTAURANT ONBOARDING (creates the restaurant in the database) ──
+function showOwnerOnboard() {
+  hideOwnerAuth();
+  document.getElementById('owner-onboard').classList.add('active');
+  onbNext(1);
+}
+function hideOwnerOnboard() {
+  document.getElementById('owner-onboard').classList.remove('active');
+}
+function onbNext(step) {
+  document.querySelectorAll('.ostep').forEach(s => s.classList.remove('on'));
+  document.getElementById('ostep-' + step).classList.add('on');
+  document.getElementById('onb-prog').textContent = 'Step ' + step + ' of 4';
+  document.getElementById('onb-fill').style.width = (step * 25) + '%';
+  if (step === 4) onbBuildReview();
+  document.getElementById('owner-onboard').scrollTop = 0;
+}
+function onbTogglePerk(el) {
+  el.classList.toggle('on');
+  el.querySelector('.oppc').textContent = el.classList.contains('on') ? '✓' : '';
+}
+function onbSelectedPerks() {
+  const perks = [...document.querySelectorAll('#onb-perks .opp.on')].map(el => ({
+    name: el.dataset.n, description: el.dataset.d || el.dataset.n
+  }));
+  const custom = document.getElementById('onb-custom-perk').value.trim();
+  if (custom) perks.push({ name: custom, description: custom });
+  return perks;
+}
+function onbBuildReview() {
+  const name = document.getElementById('onb-name').value.trim() || 'Your restaurant';
+  const nb = document.getElementById('onb-neighborhood').value.trim();
+  const city = document.getElementById('onb-city').value.trim() || 'City';
+  const price = document.getElementById('onb-price').value || '150';
+  const cap = document.getElementById('onb-cap').value || '200';
+  document.getElementById('onb-rev-name').textContent = name;
+  document.getElementById('onb-rev-loc').textContent = (nb ? nb + ' · ' : '') + city;
+  document.getElementById('onb-rev-price').textContent = '$' + price + ' / ' + (document.getElementById('onb-duration').value);
+  document.getElementById('onb-rev-cap').textContent = '№ 001 / ' + cap;
+  const perks = onbSelectedPerks();
+  document.getElementById('onb-rev-perks').innerHTML = perks.map(p => '• ' + p.name).join('<br>') || 'None selected';
+}
+async function onbCreateRestaurant() {
+  const name = document.getElementById('onb-name').value.trim();
+  const city = document.getElementById('onb-city').value.trim();
+  if (!name) { showToast('Please enter your restaurant name'); onbNext(1); return; }
+  if (!city) { showToast('Please enter your city'); onbNext(1); return; }
+  const perks = onbSelectedPerks();
+  if (perks.length < 3) { showToast('Please choose at least 3 perks'); onbNext(3); return; }
+
+  const btn = document.getElementById('onb-create-btn');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    const rest = await api('/api/restaurants', {
+      method: 'POST',
+      body: {
+        name, city,
+        neighborhood: document.getElementById('onb-neighborhood').value.trim(),
+        cuisine: document.getElementById('onb-cuisine').value.trim(),
+        instagram: document.getElementById('onb-instagram').value.trim(),
+        address: document.getElementById('onb-address').value.trim(),
+        foundingStory: document.getElementById('onb-story').value.trim(),
+        membershipCap: parseInt(document.getElementById('onb-cap').value) || 200,
+        membershipPrice: parseFloat(document.getElementById('onb-price').value) || 150,
+        membershipDuration: document.getElementById('onb-duration').value,
+        tierName: document.getElementById('onb-tier').value.trim() || 'Founding Member',
+        perks,
+      },
+    });
+    if (!rest || !rest.id) throw new Error('Could not create restaurant');
+    RESTAURANT_ID = rest.id;
+    localStorage.setItem('rb_restaurant_id', rest.id);
+    hideOwnerOnboard();
+    showToast('Your restaurant is live ✓');
+    // Load the dashboard with the new restaurant
+    const user = await api('/api/auth/me');
+    await loadOwnerRestaurant(user);
+  } catch (err) {
+    showToast(err.message || 'Could not create restaurant');
+    btn.disabled = false; btn.textContent = 'Create my restaurant →';
+  }
+}
+
+async function ownerSignup() {
+  const firstName = document.getElementById('owner-signup-firstname').value.trim();
+  const lastName = document.getElementById('owner-signup-lastname').value.trim();
+  const email = document.getElementById('owner-signup-email').value.trim();
+  const password = document.getElementById('owner-signup-password').value;
+  if (!firstName || !lastName || !email || !password) return ownerAuthError('owner-signup-error', 'Please fill in all fields.');
+  if (password.length < 6) return ownerAuthError('owner-signup-error', 'Password must be at least 6 characters.');
+  if (!document.getElementById('owner-signup-consent').checked) return ownerAuthError('owner-signup-error', 'Please agree to the Terms, Privacy Policy, and Restaurant Agreement.');
+  try {
+    const data = await api('/api/auth/signup', { method: 'POST', body: { email, password, firstName, lastName, role: 'owner' } });
+    if (!data) return;
+    TOKEN = data.token;
+    localStorage.setItem('rb_owner_token', data.token);
+    // New owner → straight into restaurant onboarding
+    document.getElementById('sidebar-avatar').textContent = data.user.first_name[0];
+    document.getElementById('sidebar-owner-name').textContent = data.user.first_name + ' ' + data.user.last_name;
+    document.getElementById('dash-owner-name').textContent = data.user.first_name;
+    showOwnerOnboard();
+  } catch (err) {
+    ownerAuthError('owner-signup-error', err.message && err.message.includes('already') ? 'This email is already registered. Log in instead.' : (err.message || 'Could not create account'));
+  }
+}
+
+async function ownerLogin() {
+  const email = document.getElementById('owner-login-email').value.trim();
+  const password = document.getElementById('owner-login-password').value;
+  if (!email || !password) return ownerAuthError('owner-login-error', 'Please enter your email and password.');
+  try {
+    const data = await api('/api/auth/login', { method: 'POST', body: { email, password } });
+    if (!data) return;
+    if (data.user.role !== 'owner' && data.user.role !== 'admin') {
+      return ownerAuthError('owner-login-error', 'This account is not a restaurant owner. Go to the member app instead.');
+    }
+    TOKEN = data.token;
+    localStorage.setItem('rb_owner_token', data.token);
+    await loadOwnerRestaurant(data.user);
+  } catch (err) {
+    ownerAuthError('owner-login-error', 'Wrong email or password. Try again.');
+  }
+}
+
+let ownerOtpEmail = '';
+async function ownerSendOTP() {
+  const email = document.getElementById('owner-otp-email').value.trim();
+  if (!email) return ownerAuthError('owner-otp-error', 'Please enter your email.');
+  try {
+    await api('/api/auth/otp/send', { method: 'POST', body: { email } });
+    ownerOtpEmail = email;
+    document.getElementById('owner-otp-sent-to').textContent = 'Code sent to ' + email;
+    ownerSwitchMode('otp-verify');
+  } catch (err) {
+    ownerAuthError('owner-otp-error', 'Could not send code. Try again.');
+  }
+}
+
+async function ownerVerifyOTP() {
+  const code = document.getElementById('owner-otp-code').value.trim();
+  if (!code) return ownerAuthError('owner-verify-error', 'Please enter the code.');
+  try {
+    const data = await api('/api/auth/otp/verify', { method: 'POST', body: { email: ownerOtpEmail, code } });
+    if (!data) return;
+    TOKEN = data.token;
+    localStorage.setItem('rb_owner_token', data.token);
+    await loadOwnerRestaurant(data.user);
+  } catch (err) {
+    ownerAuthError('owner-verify-error', 'Invalid or expired code. Try again.');
+  }
+}
+
+async function loadOwnerRestaurant(user) {
+  // Find this owner's restaurant from the API
+  try {
+    const restaurant = await api('/api/restaurants/mine/owner');
+    if (restaurant && restaurant.id) {
+      RESTAURANT_ID = restaurant.id;
+      localStorage.setItem('rb_restaurant_id', restaurant.id);
+      const nameEl = document.getElementById('sidebar-restaurant-name');
+      if (nameEl) nameEl.textContent = restaurant.name;
+      document.getElementById('sidebar-avatar').textContent = user.first_name[0];
+      document.getElementById('sidebar-owner-name').textContent = user.first_name + ' ' + user.last_name;
+      document.getElementById('dash-owner-name').textContent = user.first_name;
+      hideOwnerAuth();
+      hideOwnerOnboard();
+      updatePayoutBanner(restaurant);
+      loadDashboard();
+      return;
+    }
+    // Logged in but NO restaurant yet → start the create-restaurant onboarding
+    showOwnerOnboard();
+  } catch (err) {
+    // 404 = no restaurant for this owner → onboarding
+    showOwnerOnboard();
+  }
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', async () => {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-dashboard').classList.add('active');
+  const dashLink = findLink('dashboard');
+  if (dashLink) dashLink.classList.add('active');
+  window.scrollTo(0, 0);
+
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const d = new Date();
+  const dateStr = days[d.getDay()] + ', ' + d.toLocaleDateString('en-US',{month:'long',day:'numeric'});
+  document.getElementById('dash-date').textContent = dateStr;
+  document.getElementById('tonight-eyebrow').textContent = dateStr;
+
+  if (TOKEN) {
+    try {
+      const user = await api('/api/auth/me');
+      if (user) {
+        await loadOwnerRestaurant(user);
+        return;
+      }
+    } catch { /* fall through */ }
+  }
+  // Not logged in — show auth screen
+  showOwnerAuth();
+});
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+// ── SIDEBAR ──
+function populateSidebar(restaurant) {
+  document.getElementById('sidebar-restaurant').textContent = restaurant.name + ' · ' + restaurant.city;
+  document.getElementById('sidebar-avatar').textContent = restaurant.ownerInitial;
+  document.getElementById('sidebar-owner-name').textContent = restaurant.ownerName;
+  document.getElementById('sidebar-owner-role').textContent = restaurant.ownerRole;
+  document.getElementById('dash-owner-name').textContent = restaurant.ownerFirstName;
+}
+
+// ── DASHBOARD ──
+// ── MEMBER SCANNER (staff scans member QR) ──
+let html5QrScanner = null;
+async function startScanner() {
+  if (typeof Html5Qrcode === 'undefined') { showToast('Scanner still loading, try again'); return; }
+  document.getElementById('scan-start-card').style.display = 'none';
+  document.getElementById('scan-reader').style.display = 'block';
+  document.getElementById('scan-stop').style.display = 'block';
+  document.getElementById('scan-result').style.display = 'none';
+  try {
+    html5QrScanner = new Html5Qrcode('scan-reader');
+    await html5QrScanner.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 220, height: 220 } },
+      onScanSuccess,
+      () => {} // ignore per-frame scan errors
+    );
+  } catch (err) {
+    showToast('Could not open camera. Check permissions.');
+    resetScanUI();
+  }
+}
+async function stopScanner() {
+  if (html5QrScanner) {
+    try { await html5QrScanner.stop(); html5QrScanner.clear(); } catch (e) {}
+    html5QrScanner = null;
+  }
+  resetScanUI();
+}
+function resetScanUI() {
+  document.getElementById('scan-start-card').style.display = 'block';
+  document.getElementById('scan-reader').style.display = 'none';
+  document.getElementById('scan-stop').style.display = 'none';
+}
+async function onScanSuccess(passSerial) {
+  // Stop immediately so we don't scan repeatedly
+  if (html5QrScanner) { try { await html5QrScanner.stop(); } catch (e) {} }
+  document.getElementById('scan-reader').style.display = 'none';
+  document.getElementById('scan-stop').style.display = 'none';
+  const resEl = document.getElementById('scan-result');
+  const body = document.getElementById('scan-result-body');
+  resEl.style.display = 'block';
+  body.innerHTML = '<div style="text-align:center;padding:10px;color:rgba(242,234,212,.7)">Checking…</div>';
+  try {
+    // Record the check-in (also validates membership belongs to this restaurant)
+    const r = await api('/api/checkin', {
+      method: 'POST',
+      body: { passSerial, restaurantId: RESTAURANT_ID, method: 'qr' },
+    });
+    if (r && r.success) {
+      const m = r.member;
+      body.innerHTML = `
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--olive);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:22px;color:#fff">${(m.firstName||'?')[0]}</div>
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:500">${m.firstName} ${m.lastName}</div>
+            <div style="font-size:12px;color:rgba(242,234,212,.7);font-family:'JetBrains Mono',monospace">${m.serial} · ${m.tier}</div>
+          </div>
+          <div style="margin-left:auto;text-align:right"><div style="font-family:'Fraunces',serif;font-size:26px;color:#e8b59a">${m.visits}</div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(242,234,212,.6)">visits</div></div>
+        </div>
+        <div style="background:rgba(107,122,79,.25);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px">✓ Checked in just now — apply their perks</div>
+        <button class="btn btn-primary" style="width:100%;background:#C5572C" onclick="document.getElementById('scan-result').style.display='none';resetScanUI()">Done — scan next</button>`;
+    } else {
+      throw new Error('Not recognized');
+    }
+  } catch (err) {
+    body.innerHTML = `
+      <div style="text-align:center;padding:6px">
+        <div style="font-size:32px;margin-bottom:8px">⚠️</div>
+        <div style="font-family:'Fraunces',serif;font-size:18px;margin-bottom:6px">${err.message && err.message.includes('expired') ? 'Membership expired' : 'Not a valid member here'}</div>
+        <div style="font-size:12.5px;color:rgba(242,234,212,.7);margin-bottom:16px">This QR isn't an active membership for your restaurant.</div>
+        <button class="btn btn-primary" style="width:100%;background:#C5572C" onclick="document.getElementById('scan-result').style.display='none';resetScanUI()">Try again</button>
+      </div>`;
+  }
+}
+
+// ── BANK ACCOUNT / PAYOUTS (Stripe Connect) ──
+async function setupPayouts() {
+  if (!RESTAURANT_ID) { showToast('No restaurant loaded'); return; }
+  const btn = document.getElementById('payout-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Opening…'; }
+  try {
+    const res = await api('/api/restaurants/' + RESTAURANT_ID + '/stripe-connect', { method: 'POST' });
+    if (res && res.url) {
+      window.location.href = res.url; // Stripe's secure hosted onboarding
+    } else {
+      throw new Error('Could not start payout setup');
+    }
+  } catch (err) {
+    showToast(err.message || 'Could not open payout setup');
+    if (btn) { btn.disabled = false; btn.textContent = 'Set up payouts →'; }
+  }
+}
+
+// Show the right payout banner based on whether the bank is connected
+function updatePayoutBanner(restaurant) {
+  const banner = document.getElementById('payout-banner');
+  const done = document.getElementById('payout-done');
+  if (!banner || !done) return;
+  if (restaurant && restaurant.stripe_onboarded) {
+    banner.style.display = 'none';
+    done.style.display = 'flex';
+  } else {
+    banner.style.display = 'flex';
+    done.style.display = 'none';
+  }
+}
+
+async function loadDashboard() {
+  if (!RESTAURANT_ID) return;
+  try {
+    const data = await api('/api/dashboard/' + RESTAURANT_ID);
+    if (!data) return;
+
+    // Sidebar restaurant name
+    document.getElementById('sidebar-restaurant').textContent = data.restaurant.name + ' · ' + data.restaurant.city;
+    document.getElementById('dash-sub').textContent = data.restaurant.neighborhood + ' · ' + data.restaurant.city;
+
+    // KPIs
+    document.getElementById('kpi-cash').textContent = '$' + parseFloat(data.kpis.cashMonth).toLocaleString();
+    document.getElementById('kpi-cash-trend').textContent = 'This month';
+    document.getElementById('kpi-ytd').textContent = '$' + parseFloat(data.kpis.cashYTD).toLocaleString();
+    document.getElementById('kpi-ytd-trend').textContent = 'Year to date';
+    document.getElementById('kpi-visits').textContent = data.kpis.visitsMonth;
+    document.getElementById('kpi-visits-trend').textContent = data.kpis.uniqueMonth + ' unique members';
+    document.getElementById('kpi-avg-visits').textContent = data.kpis.avgWeekly || '—';
+
+    // Progress bar
+    const p = data.progress;
+    document.getElementById('prog-sold').textContent = p.sold;
+    document.getElementById('prog-cap').textContent = p.cap;
+    document.getElementById('prog-pct').textContent = p.pct + '% sold';
+    document.getElementById('prog-remaining').textContent = p.remaining + ' remaining';
+    document.getElementById('prog-fill').style.width = p.pct + '%';
+    document.getElementById('prog-meta-left').textContent = p.sold7d + ' sold this week';
+    document.getElementById('prog-meta-right').textContent = p.sold30d + ' sold this month';
+
+    // Tonight
+    renderDashboardTonight(data.tonight);
+
+    // Vote
+    renderDashboardVote(data.activeVote);
+
+    // Activity
+    renderDashboardActivity(data.recentActivity.map(a => ({
+      dotClass: a.type === 'join' ? '' : 'olive',
+      text: a.type === 'join'
+        ? `<strong>${a.name}</strong> joined as <strong>№ ${String(a.serial_number).padStart(3,'0')}</strong>`
+        : `<strong>${a.name}</strong> visited`,
+      amount: a.type === 'join' ? '+ $' + parseFloat(a.amount_paid||0).toFixed(2) : null,
+      time: formatTimeAgo(new Date(a.ts)),
+    })));
+
+    // Menu summary
+    document.getElementById('dash-menu-count').textContent = data.menu.totalDishes + ' dishes published';
+    document.getElementById('dash-avg-kcal').textContent = data.menu.avgKcal || '—';
+    document.getElementById('dash-ai-count').textContent = data.menu.aiCount;
+    document.getElementById('dash-precise-count').textContent = data.menu.preciseCount;
+    document.getElementById('dash-menu-views').textContent = '—';
+
+    // Chart
+    const chartData = await api('/api/dashboard/' + RESTAURANT_ID + '/sales-chart');
+    if (chartData) renderSalesChart(chartData);
+  } catch (err) { console.error('loadDashboard:', err); showToast('Dashboard error: ' + err.message); }
+}
+
+function renderSalesChart(data) {
+  if (!data.length) return;
+  const svg = document.getElementById('dash-chart');
+  const W = 600, H = 180;
+  const maxY = Math.max(...data.map(d => parseInt(d.count)), 1);
+  const pts = data.map((d, i) => {
+    const x = (i / (data.length - 1 || 1)) * (W - 40) + 20;
+    const y = H - ((parseInt(d.count) / maxY) * (H - 30)) - 10;
+    return `${x},${y}`;
+  }).join(' ');
+  svg.innerHTML = `
+    <polyline points="${pts}" fill="none" stroke="#C5572C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${data.map((d,i) => { const [x,y] = pts.split(' ')[i].split(',');
+      return `<circle cx="${x}" cy="${y}" r="4" fill="#C5572C"/>`;
+    }).join('')}`;
+}
+
+// ── TONIGHT ──
+async function loadTonight() {
+  if (!RESTAURANT_ID) return;
+  try {
+    const data = await api('/api/dashboard/' + RESTAURANT_ID);
+    if (!data) return;
+    document.getElementById('tonight-sub').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) + ' · ' + data.tonight.length + ' members reserved';
+    renderTonight(data.tonight);
+  } catch (err) { showToast(err.message); }
+}
+
+function renderTonight(reservations) {
+  const el = document.getElementById('tonight-reservations-list');
+  if (!reservations.length) {
+    el.innerHTML = '<div class="empty-view" style="padding:40px 0"><div class="ei">🕯️</div><h3>No reservations <em>yet</em></h3><p>Member reservations appear here when they RSVP through the app.</p></div>';
+    return;
+  }
+  el.innerHTML = reservations.map(r => `
+    <div class="res-row">
+      <div class="res-time">—</div>
+      <div><div class="res-member-name">${r.first_name} ${r.last_name}</div>
+        <div class="res-member-meta">№ ${String(r.serial_number).padStart(3,'0')} · ${r.visit_count} visits</div></div>
+      <div class="res-party">—</div>
+      <div class="res-tag priority">${r.tier}</div>
+    </div>`).join('');
+}
+
+// ── MEMBERS ──
+async function loadMembers() {
+  if (!RESTAURANT_ID) return;
+  document.getElementById('members-sub').textContent = 'Loading…';
+  try {
+    const members = await api('/api/memberships/restaurant/' + RESTAURANT_ID);
+    if (!members) return;
+    window.MEMBERS_CACHE = members; // keep for the detail overlay
+    document.getElementById('members-sub').textContent = members.length + ' active members';
+    renderMembersTable(members);
+  } catch (err) { showToast(err.message); }
+}
+
+function renderMembersTable(members) {
+  const table = document.getElementById('members-table');
+  if (!members.length) {
+    table.innerHTML = `<div class="empty-view" style="padding:48px 0">
+      <div class="ei">👥</div><h3>No members <em>yet</em></h3>
+      <p>Once your membership goes live and someone joins, they'll appear here.</p>
+      <button class="btn btn-primary" onclick="showToast('Link copied ✓')">Share membership link</button>
+    </div>`;
+    return;
+  }
+  table.innerHTML = `<div class="table-row head"><div>№</div><div>Member</div><div>Tier</div><div>Visits</div><div>Joined</div><div>Status</div></div>` +
+    members.map(m => `
+      <div class="table-row" onclick="openMemberOverlay('${m.id}')">
+        <div class="table-serial">№ ${String(m.serial_number).padStart(3,'0')}</div>
+        <div class="table-name">${m.first_name} ${m.last_name}<small>${m.email}</small></div>
+        <div><span class="table-tier ${m.tier === 'Founding Member' ? 'founding' : 'member'}">${m.tier}</span></div>
+        <div class="table-cell">${m.visit_count || 0}</div>
+        <div class="table-cell">${new Date(m.purchased_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+        <div class="table-cell" style="color:var(--olive)">${m.status}</div>
+      </div>`).join('');
+}
+
+function renderMembers(filter, search) {
+  loadMembers(); // reload with filter when API supports it
+}
+
+function filterPill(btn, val) {
+  if (btn) {
+    btn.closest('.members-toolbar')?.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  loadMembers();
+}
+
+async function openMemberOverlay(memberId) {
+  openOverlay('overlay-member');
+  // Find the member in the cache loaded by loadMembers()
+  const m = (window.MEMBERS_CACHE || []).find(x => String(x.id) === String(memberId));
+  if (!m) {
+    document.getElementById('overlay-member-name').textContent = 'Member not found';
+    return;
+  }
+  const fmt = (d) => d ? new Date(d).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—';
+  document.getElementById('overlay-member-name').textContent = (m.first_name || '') + ' ' + (m.last_name || '');
+  document.getElementById('overlay-member-tier').textContent = m.tier || 'Member';
+  document.getElementById('overlay-member-restaurant').textContent = m.email || '';
+  document.getElementById('overlay-member-joined').textContent = fmt(m.purchased_at);
+  document.getElementById('overlay-member-serial').textContent = '№ ' + String(m.serial_number).padStart(3,'0');
+  document.getElementById('overlay-member-visits').textContent = m.visit_count || 0;
+  document.getElementById('overlay-member-perks').textContent = '—';
+  document.getElementById('overlay-member-renews').textContent = fmt(m.valid_until);
+  const visitsList = document.getElementById('overlay-member-visits-list');
+  if (m.last_visit) {
+    visitsList.innerHTML = `<div style="padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-soft)">Last visit: ${new Date(m.last_visit).toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'})}</div>`;
+  } else {
+    visitsList.innerHTML = `<div style="padding:10px 0;font-size:13px;color:var(--smoke)">No visits recorded yet.</div>`;
+  }
+}
+
+// ── ACTIVITY ──
+async function loadActivity() {
+  if (!RESTAURANT_ID) return;
+  try {
+    const data = await api('/api/dashboard/' + RESTAURANT_ID);
+    if (!data) return;
+    renderActivity(data.recentActivity.map(a => ({
+      dotClass: a.type === 'join' ? '' : 'olive',
+      text: a.type === 'join'
+        ? `<strong>${a.name}</strong> joined as <strong>№ ${String(a.serial_number).padStart(3,'0')}</strong>`
+        : `<strong>${a.name}</strong> visited`,
+      amount: a.type === 'join' ? '+ $' + parseFloat(a.amount_paid||0).toFixed(2) : null,
+      time: formatTimeAgo(new Date(a.ts)),
+    })));
+  } catch (err) { showToast(err.message); }
+}
+
+function renderActivity(items) {
+  const el = document.getElementById('activity-feed');
+  if (!items.length) {
+    el.innerHTML = '<div class="empty-view" style="padding:40px 0"><div class="ei">⚡</div><h3>No activity <em>yet</em></h3><p>Every join, visit and perk use appears here in real time.</p></div>';
+    return;
+  }
+  el.innerHTML = items.map(i => `
+    <div class="activity-item">
+      <div class="activity-dot ${i.dotClass}"></div>
+      <div class="activity-text">${i.text}${i.amount ? `<div class="activity-amount" style="margin-top:2px">${i.amount}</div>` : ''}</div>
+      <div class="activity-time">${i.time}</div>
+    </div>`).join('');
+}
+
+// ── EVENTS ──
+async function loadEvents() {
+  if (!RESTAURANT_ID) return;
+  try {
+    const events = await api('/api/events/' + RESTAURANT_ID + '/all');
+    if (!events) return;
+    const upcoming = events.filter(e => new Date(e.event_date) > new Date()).length;
+    document.getElementById('events-sub').textContent = upcoming + ' upcoming · ' + (events.length - upcoming) + ' past';
+    renderEvents({ upcoming, past: events.length - upcoming, items: events });
+  } catch (err) { showToast(err.message); }
+}
+
+function renderEvents(data) {
+  const el = document.getElementById('events-list');
+  if (!data.items.length) {
+    el.innerHTML = '<div class="empty-view"><div class="ei">📅</div><h3>No events <em>yet</em></h3><p>Create your first members-only event.</p><button class="btn btn-primary" onclick="openOverlay(\'overlay-event\')">Create first event →</button></div>';
+    return;
+  }
+  el.innerHTML = data.items.map(e => {
+    const dt = new Date(e.event_date);
+    const isPast = dt < new Date();
+    return `<div class="event-card">
+      <div class="event-date-block"><div class="event-day">${dt.getDate()}</div><div class="event-month">${dt.toLocaleString('en-US',{month:'short'})}</div></div>
+      <div class="event-info"><h4>${e.title}</h4><div class="event-info-meta">${e.description || ''}</div>
+        <div class="event-info-rsvp${parseInt(e.rsvp_count) >= e.capacity ? ' full' : ''}">${e.rsvp_count} / ${e.capacity} RSVPs</div></div>
+      <div class="event-status ${isPast ? 'draft' : ''}">${isPast ? 'Past' : 'Live'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── VOTES ──
+async function loadVotes() {
+  if (!RESTAURANT_ID) return;
+  try {
+    const votes = await api('/api/votes/restaurant/' + RESTAURANT_ID);
+    if (!votes) return;
+    const live = votes.filter(v => v.status === 'live').length;
+    document.getElementById('votes-sub').textContent = live + ' active · ' + (votes.length - live) + ' closed';
+    renderVotes({ active: live, closed: votes.length - live, items: votes });
+  } catch (err) { showToast(err.message); }
+}
+
+function renderVotes(data) {
+  const el = document.getElementById('votes-list');
+  if (!data.items.length) {
+    el.innerHTML = '<div class="empty-view"><div class="ei">🗳️</div><h3>No votes <em>yet</em></h3><p>Ask members what goes on the next menu.</p><button class="btn btn-primary" onclick="openOverlay(\'overlay-vote\')">Create first vote →</button></div>';
+    return;
+  }
+  el.innerHTML = data.items.map(v => {
+    const opts = (v.options||[]).map(o => {
+      const pct = v.total_votes > 0 ? Math.round((o.count / v.total_votes) * 100) : 0;
+      return `<div class="vote-result"><div class="vote-bar" style="width:${pct}%"></div><div class="vote-row-content"><span class="vote-text">${o.text}</span><span class="vote-stat">${o.count} · ${pct}%</span></div></div>`;
+    }).join('');
+    const closesIn = v.closes_at ? 'Closes ' + new Date(v.closes_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+    return `<div class="vote-card">
+      <div class="vote-card-header"><div><div class="vote-card-title">${v.question}</div><div class="vote-card-meta">${v.total_votes} votes</div></div>
+        <div class="vote-card-status ${v.status === 'live' ? 'live' : 'closed'}">${v.status}</div></div>
+      ${opts}
+      <div class="vote-status"><span>${v.total_votes} voted</span>${closesIn ? `<span class="urgent">${closesIn}</span>` : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── NOTES ──
+async function loadNotes() {
+  if (!RESTAURANT_ID) return;
+  try {
+    const notes = await api('/api/notes/' + RESTAURANT_ID + '/all');
+    if (!notes) return;
+    renderNoteHistory(notes);
+  } catch (err) { /* silent */ }
+}
+
+function renderNoteHistory(notes) {
+  const el = document.getElementById('notes-history-list');
+  if (!notes.length) {
+    el.innerHTML = '<div style="padding:24px;background:var(--sand-warm);border:1px solid var(--line);border-radius:14px;text-align:center;font-size:13px;color:var(--smoke)">No notes sent yet</div>';
+    return;
+  }
+  el.innerHTML = notes.map(n => `
+    <div style="padding:16px;background:var(--sand-warm);border:1px solid var(--line);border-radius:14px;margin-bottom:8px;display:flex;justify-content:space-between;gap:12px">
+      <div style="flex:1"><div style="font-weight:600;font-size:14px;margin-bottom:4px">${n.title}</div>
+        <div style="font-size:12px;color:var(--smoke)">${n.body.substring(0,80)}${n.body.length>80?'…':''}</div></div>
+      <div style="text-align:right;font-size:11px;color:var(--smoke);flex-shrink:0;line-height:1.8">
+        ${n.sent_at ? new Date(n.sent_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : 'Draft'}
+      </div>
+    </div>`).join('');
+}
+
+// ── TERMS ──
+async function loadTerms() {
+  if (!RESTAURANT_ID) return;
+  try {
+    const r = await api('/api/restaurants/' + RESTAURANT_ID + '/mine');
+    if (!r) return;
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+    setVal('terms-name', r.name);
+    setVal('terms-neighborhood', r.neighborhood);
+    setVal('terms-city', r.city);
+    setVal('terms-cap', r.membership_cap);
+    setVal('terms-price', '$' + r.membership_price);
+    const dur = document.getElementById('terms-duration');
+    if (dur && r.membership_duration) dur.value = r.membership_duration;
+  } catch (err) { /* silent */ }
+}
+
+// ── PERKS ──
+// Suggested perks the owner can turn on — gives them ideas
+const SUGGESTED_PERKS = [
+  { name: 'Priority weekend table', description: 'Guaranteed seating Fri–Sat, up to 4 guests' },
+  { name: 'Members-only chef nights', description: 'Quarterly events with the kitchen team' },
+  { name: 'Early menu access', description: 'Try new dishes 2 weeks before the public' },
+  { name: 'Vote on the menu', description: 'Members help choose new dishes each month' },
+  { name: 'Welcome drink on arrival', description: 'A glass on the house, every visit' },
+  { name: '+1 guest at all events', description: 'Always bring a friend to member events' },
+  { name: 'Members-only wine list', description: 'Bottles not available to the public' },
+  { name: 'Skip the waitlist', description: 'Members never wait for a table' },
+  { name: 'Birthday treat', description: 'A special dessert or bottle on your birthday' },
+  { name: 'Kitchen table experience', description: 'Dine at the pass with the chef, once a season' },
+  { name: '10% off the bill', description: 'A standing discount, every visit' },
+  { name: 'First access to special events', description: 'Book collaborations and tastings before anyone' },
+  { name: 'Free corkage', description: 'Bring your own bottle, no fee' },
+  { name: 'Seasonal gift', description: 'A house-made treat to take home each season' },
+];
+
+let PERKS_STATE = []; // [{name, description, on}]
+
+async function loadPerks() {
+  if (!RESTAURANT_ID) return;
+  let active = [];
+  try {
+    const r = await api('/api/restaurants/' + RESTAURANT_ID + '/mine');
+    active = (r && r.perks) || [];
+  } catch (err) { /* show suggestions anyway */ }
+
+  // Build the state: every suggested perk + any custom active ones, marking which are on
+  const activeNames = active.map(p => (p.name || '').toLowerCase());
+  PERKS_STATE = SUGGESTED_PERKS.map(p => ({ ...p, on: activeNames.includes(p.name.toLowerCase()) }));
+  // Add active perks that aren't in the suggested list (custom ones)
+  active.forEach(p => {
+    if (!SUGGESTED_PERKS.some(s => s.name.toLowerCase() === (p.name || '').toLowerCase())) {
+      PERKS_STATE.push({ name: p.name, description: p.description || p.name, on: true });
+    }
+  });
+  renderPerksGallery();
+}
+
+function renderPerksGallery() {
+  const onCount = PERKS_STATE.filter(p => p.on).length;
+  document.getElementById('perks-sub').textContent = onCount + ' active · tap to toggle';
+  document.getElementById('perks-gallery').innerHTML = PERKS_STATE.map((p, i) => `
+    <div class="perk-tile ${p.on ? 'on' : ''}" onclick="togglePerk(${i})">
+      <div class="pt-txt"><strong>${p.name}</strong><span>${p.description}</span></div>
+      <div class="pt-check">✓</div>
+    </div>`).join('');
+}
+
+function togglePerk(i) {
+  PERKS_STATE[i].on = !PERKS_STATE[i].on;
+  renderPerksGallery();
+}
+
+function addCustomPerk() {
+  const input = document.getElementById('custom-perk-input');
+  const name = input.value.trim();
+  if (!name) return;
+  PERKS_STATE.push({ name, description: name, on: true });
+  input.value = '';
+  renderPerksGallery();
+}
+
+async function savePerks() {
+  if (!RESTAURANT_ID) return;
+  const btn = document.getElementById('perks-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const perks = PERKS_STATE.filter(p => p.on).map(p => ({ name: p.name, description: p.description }));
+    await api('/api/restaurants/' + RESTAURANT_ID + '/perks', { method: 'PUT', body: { perks } });
+    showToast('Perks saved ✓ — members see them now');
+  } catch (err) {
+    showToast(err.message || 'Could not save perks');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save perks';
+  }
+}
+
+function renderPerks(perks) {
+  const el = document.getElementById('perks-list');
+  if (!perks.items.length) {
+    el.innerHTML = '<div class="empty-view"><div class="ei">🎁</div><h3>No perks <em>configured yet</em></h3><p>Add the experiences you\'ll give members.</p><button class="btn btn-primary" onclick="showToast(\'Contact support to add perks\')">+ Add first perk</button></div>';
+    return;
+  }
+  el.innerHTML = perks.items.map(p => `
+    <div class="perk-row-item">
+      <div class="perk-row-info"><div class="perk-row-name">${p.name}</div><div class="perk-row-desc">${p.description}</div></div>
+      <div class="perk-row-actions"><button class="icon-btn">✎</button><button class="icon-btn">⋯</button></div>
+    </div>`).join('');
+}
+
+// ── MENU ──
+async function loadMenu() {
+  if (!RESTAURANT_ID) return;
+  try {
+    const dishes = await api('/api/menu/' + RESTAURANT_ID);
+    if (!dishes) return;
+    const total = dishes.length;
+    const aiCount = dishes.filter(d => d.nutrition_mode === 'ai').length;
+    const avgKcal = total ? Math.round(dishes.filter(d=>d.kcal).reduce((s,d)=>s+d.kcal,0) / (dishes.filter(d=>d.kcal).length||1)) : 0;
+    document.getElementById('menu-kpi-dishes').textContent = total;
+    document.getElementById('menu-kpi-mode').textContent = aiCount + ' AI · ' + (total-aiCount) + ' precise';
+    document.getElementById('menu-kpi-kcal').textContent = avgKcal + ' kcal';
+    document.getElementById('menu-kpi-views').textContent = '—';
+    document.getElementById('menu-kpi-views-trend').textContent = '';
+    renderMenu({ totalDishes: total, aiCount, preciseCount: total-aiCount, avgKcal, weeklyViews:'—', viewsTrend:'', dishes: dishes.map(d => ({
+      id: d.id, name: d.name, description: d.description||'', category: d.category,
+      modeClass: d.nutrition_mode === 'ai' ? 'dish-tag ai' : 'dish-tag precise',
+      modeLabel: d.nutrition_mode === 'ai' ? '✦ AI' : '⊙ Precise',
+      kcal: d.kcal||'—', protein: (d.protein_g||'—')+'g', fat: (d.fat_g||'—')+'g', carbs: (d.carbs_g||'—')+'g',
+    })) });
+  } catch (err) { showToast(err.message); }
+}
+
+function renderMenu(menu) {
+  const el = document.getElementById('menu-dish-list');
+  if (!menu.dishes.length) {
+    el.innerHTML = '<div class="empty-view" style="padding:40px 0"><div class="ei">🍽️</div><h3>No dishes <em>yet</em></h3><p>Add your first dish.</p><button class="btn btn-primary" onclick="openOverlay(\'overlay-add-dish\');resetDishForm()">Add first dish →</button></div>';
+    return;
+  }
+  el.innerHTML = menu.dishes.map(d => `
+    <div class="dish-card">
+      <div class="dish-card-info">
+        <div class="dish-name">${d.name}</div>
+        <div class="dish-desc">${d.description}</div>
+        <div class="dish-tags"><span class="dish-tag cat">${d.category}</span><span class="${d.modeClass}">${d.modeLabel}</span></div>
+        <div class="dish-macros">
+          <div class="dish-macro"><div class="v">${d.kcal}</div><div class="l">kcal</div></div>
+          <div class="dish-macro"><div class="v">${d.protein}</div><div class="l">Protein</div></div>
+          <div class="dish-macro"><div class="v">${d.fat}</div><div class="l">Fat</div></div>
+          <div class="dish-macro"><div class="v">${d.carbs}</div><div class="l">Carbs</div></div>
+        </div>
+      </div>
+      <div class="dish-actions"><button class="icon-btn" onclick="loadDishForEdit('${d.id}')">✎</button><button class="icon-btn">⋯</button></div>
+    </div>`).join('');
+}
+
+function filterMenu(btn, cat) {
+  document.querySelectorAll('#view-menu .filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+async function submitNote() {
+  if (!RESTAURANT_ID) { showToast('No restaurant loaded'); return; }
+  const title = document.getElementById('note-title').value.trim();
+  const body = document.getElementById('note-body').value.trim();
+  if (!title || !body) { showToast('Please add a title and message'); return; }
+  const btn = document.getElementById('note-send-btn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await api('/api/notes/' + RESTAURANT_ID, {
+      method: 'POST',
+      body: { title, body, audience: 'all' },
+    });
+    showToast('Note sent to members ✓');
+    document.getElementById('note-title').value = '';
+    document.getElementById('note-body').value = '';
+    if (typeof updateNotePreview === 'function') updateNotePreview();
+    loadNotes(); // refresh sent notes
+  } catch (err) {
+    showToast(err.message || 'Could not send note');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send note';
+  }
+}
+
+async function submitEvent() {
+  if (!RESTAURANT_ID) { showToast('No restaurant loaded'); return; }
+  const title = document.getElementById('event-title').value.trim();
+  const date = document.getElementById('event-date').value;
+  const time = document.getElementById('event-time').value || '19:00';
+  const capacity = parseInt(document.getElementById('event-capacity').value) || 20;
+  const description = document.getElementById('event-desc').value.trim();
+  if (!title) { showToast('Please add an event title'); return; }
+  if (!date) { showToast('Please choose a date'); return; }
+  const btn = document.getElementById('event-submit-btn');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    await api('/api/events/' + RESTAURANT_ID, {
+      method: 'POST',
+      body: { title, description, eventDate: new Date(date + 'T' + time).toISOString(), capacity, status: 'published' },
+    });
+    closeOverlay('overlay-event');
+    showToast('Event created ✓ — members notified');
+    // Reset form
+    document.getElementById('event-title').value = '';
+    document.getElementById('event-desc').value = '';
+    loadEvents(); // refresh the list
+  } catch (err) {
+    showToast(err.message || 'Could not create event');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Create event →';
+  }
+}
+
+async function submitVote() {
+  if (!RESTAURANT_ID) { showToast('No restaurant loaded'); return; }
+  const question = document.getElementById('vote-question').value.trim();
+  const opts = [
+    document.getElementById('vote-opt1').value.trim(),
+    document.getElementById('vote-opt2').value.trim(),
+    document.getElementById('vote-opt3').value.trim(),
+  ].filter(Boolean);
+  if (!question) { showToast('Please add a question'); return; }
+  if (opts.length < 2) { showToast('Please add at least two options'); return; }
+  const days = parseInt(document.getElementById('vote-closes').value) || 7;
+  const closesAt = new Date(Date.now() + days * 86400000).toISOString();
+  const btn = document.getElementById('vote-submit-btn');
+  btn.disabled = true; btn.textContent = 'Starting…';
+  try {
+    await api('/api/votes/' + RESTAURANT_ID, {
+      method: 'POST',
+      body: { question, options: opts, closesAt },
+    });
+    closeOverlay('overlay-vote');
+    showToast('Vote is live ✓ — members notified');
+    document.getElementById('vote-question').value = '';
+    document.getElementById('vote-opt1').value = '';
+    document.getElementById('vote-opt2').value = '';
+    document.getElementById('vote-opt3').value = '';
+    loadVotes(); // refresh
+  } catch (err) {
+    showToast(err.message || 'Could not start vote');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Start vote →';
+  }
+}
+
+async function saveDish() {
+  if (!RESTAURANT_ID) return;
+  const name = document.getElementById('dish-name-input').value.trim();
+  if (!name) { showToast('Please add a dish name'); return; }
+  const mode = document.getElementById('mode-ai-btn').classList.contains('on') ? 'ai' : 'precise';
+  let kcal, protein, fat, carbs;
+  if (mode === 'ai') {
+    kcal = parseInt(document.getElementById('ai-kcal').textContent) || null;
+    protein = parseFloat(document.getElementById('ai-protein').textContent) || null;
+    fat = parseFloat(document.getElementById('ai-fat').textContent) || null;
+    carbs = parseFloat(document.getElementById('ai-carbs').textContent) || null;
+  } else {
+    kcal = parseInt(document.getElementById('pr-kcal').textContent) || null;
+    protein = parseFloat(document.getElementById('pr-protein').textContent) || null;
+    fat = parseFloat(document.getElementById('pr-fat').textContent) || null;
+    carbs = parseFloat(document.getElementById('pr-carbs').textContent) || null;
+  }
+  try {
+    await api('/api/menu/' + RESTAURANT_ID, {
+      method: 'POST',
+      body: {
+        name,
+        category: document.getElementById('dish-category').value,
+        nutritionMode: mode,
+        aiIngredients: mode === 'ai' ? document.getElementById('ai-ingredients').value : null,
+        aiPortion: mode === 'ai' ? document.getElementById('ai-portion').value : null,
+        kcal, proteinG: protein, fatG: fat, carbsG: carbs,
+      },
+    });
+    closeOverlay('overlay-add-dish');
+    showToast('Dish saved ✓ — visible to members now');
+    loadMenu();
+  } catch (err) { showToast('Error: ' + err.message); }
+}
+
+async function loadDishForEdit(dishId) {
+  openOverlay('overlay-add-dish');
+  // Pre-fill with dish data — extend as needed
+}
+
+// ── HELPER ──
+function formatTimeAgo(date) {
+  const s = Math.round((Date.now() - date.getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+function renderDashboardKPIs(kpis) {
+  // kpis: { cashMonth, cashYTD, visitsMonth, avgVisits, trends }
+  document.getElementById('kpi-cash').textContent = kpis.cashMonth;
+  document.getElementById('kpi-cash-trend').textContent = kpis.cashMonthTrend;
+  document.getElementById('kpi-ytd').textContent = kpis.cashYTD;
+  document.getElementById('kpi-ytd-trend').textContent = kpis.cashYTDTrend;
+  document.getElementById('kpi-visits').textContent = kpis.visitsMonth;
+  document.getElementById('kpi-visits-trend').textContent = kpis.visitsMonthTrend;
+  document.getElementById('kpi-avg-visits').textContent = kpis.avgVisits;
+  document.getElementById('dash-sub').textContent = kpis.subline;
+}
+
+function renderDashboardProgress(prog) {
+  // prog: { sold, cap, pct, remaining, firstMemberLabel, paceLabel }
+  document.getElementById('prog-sold').textContent = prog.sold;
+  document.getElementById('prog-cap').textContent = prog.cap;
+  document.getElementById('prog-pct').textContent = prog.pct + '% sold';
+  document.getElementById('prog-remaining').textContent = prog.remaining + ' remaining';
+  document.getElementById('prog-fill').style.width = prog.pct + '%';
+  document.getElementById('prog-meta-left').textContent = prog.firstMemberLabel;
+  document.getElementById('prog-meta-right').textContent = prog.paceLabel;
+}
+
+function renderDashboardTonight(reservations) {
+  // reservations: [{ time, name, serial, visits, party, tag, tagClass }]
+  const el = document.getElementById('dash-tonight-list');
+  document.getElementById('dash-tonight-title').textContent = 'Tonight · ' + reservations.length;
+  if (!reservations.length) { el.innerHTML = '<div style="padding:20px 0;text-align:center;font-size:13px;color:var(--smoke)">No reservations tonight</div>'; return; }
+  el.innerHTML = reservations.map(r => `
+    <div class="res-row">
+      <div class="res-time">${r.time}</div>
+      <div><div class="res-member-name">${r.name}</div><div class="res-member-meta">${r.serial} · ${r.visits} visits</div></div>
+      <div class="res-party">${r.party} guests</div>
+      <div class="res-tag ${r.tagClass}">${r.tag}</div>
+    </div>`).join('');
+}
+
+function renderDashboardVote(vote) {
+  // vote: null | { question, options: [{ text, votes, pct }], totalVoted, totalMembers, closesIn }
+  const el = document.getElementById('dash-vote-panel');
+  if (!vote) { el.innerHTML = '<div style="padding:20px 0;text-align:center;font-size:13px;color:var(--smoke)">No active votes</div>'; return; }
+  el.innerHTML = `
+    <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:500;letter-spacing:-.015em;margin-bottom:12px">${vote.question}</div>
+    ${vote.options.map(o => `
+      <div class="vote-result">
+        <div class="vote-bar" style="width:${o.pct}%"></div>
+        <div class="vote-row-content"><span class="vote-text">${o.text}</span><span class="vote-stat">${o.votes} · ${o.pct}%</span></div>
+      </div>`).join('')}
+    <div class="vote-status"><span>${vote.totalVoted} of ${vote.totalMembers} voted</span><span class="urgent">Closes in ${vote.closesIn}</span></div>`;
+}
+
+function renderDashboardActivity(items) {
+  // items: [{ dotClass, text, amount, time }]
+  const el = document.getElementById('dash-activity-list');
+  if (!items.length) { el.innerHTML = '<div style="padding:20px 0;text-align:center;font-size:13px;color:var(--smoke)">No activity yet</div>'; return; }
+  el.innerHTML = items.map(i => `
+    <div class="activity-item">
+      <div class="activity-dot ${i.dotClass}"></div>
+      <div class="activity-text">${i.text}${i.amount ? `<div class="activity-amount" style="margin-top:2px">${i.amount}</div>` : ''}</div>
+      <div class="activity-time">${i.time}</div>
+    </div>`).join('');
+}
+
+function renderDashboardMenuSummary(stats) {
+  // stats: { dishCount, avgKcal, aiCount, preciseCount, weeklyViews, viewsTrend, topDishes: [] }
+  document.getElementById('dash-menu-count').textContent = stats.dishCount + ' dishes published';
+  document.getElementById('dash-avg-kcal').textContent = stats.avgKcal + ' kcal';
+  document.getElementById('dash-ai-count').textContent = stats.aiCount;
+  document.getElementById('dash-precise-count').textContent = stats.preciseCount;
+  document.getElementById('dash-menu-views').textContent = stats.weeklyViews;
+  const topEl = document.getElementById('dash-menu-top-list');
+  if (!stats.topDishes.length) return;
+  topEl.innerHTML = stats.topDishes.map(d => `
+    <div class="menu-top-row" onclick="navigate('menu',findLink('menu'))">
+      <div style="flex:1;min-width:0"><div class="menu-top-name">${d.name}</div><div class="menu-top-meta"><span class="dish-tag ${d.modeClass}" style="font-size:8px">${d.modeLabel}</span>${d.kcal} kcal · ${d.protein}</div></div>
+      <div class="menu-top-views">${d.views} views</div>
+    </div>`).join('');
+}
+
+function renderDashboardChart(dataPoints) {
+  // dataPoints: [{ x, y }] — 30 days of daily membership sales
+  const svg = document.getElementById('dash-chart');
+  if (!dataPoints || !dataPoints.length) return;
+  // Build path from data...
+}
+
+// ── TONIGHT ──
+// ── MEMBERS ──
+function renderMemberOverlay(member) {
+  // member: { name, tier, restaurantLabel, serial, joined, visits, perksUsed, renewsAt, visitHistory }
+  document.getElementById('overlay-member-name').textContent = member.name;
+  document.getElementById('overlay-member-tier').textContent = member.tier;
+  document.getElementById('overlay-member-restaurant').textContent = member.restaurantLabel;
+  document.getElementById('overlay-member-serial').textContent = member.serial;
+  document.getElementById('overlay-member-joined').textContent = member.joined;
+  document.getElementById('overlay-member-visits').textContent = member.visits;
+  document.getElementById('overlay-member-perks').textContent = member.perksUsed;
+  document.getElementById('overlay-member-renews').textContent = member.renewsAt;
+  const vl = document.getElementById('overlay-member-visits-list');
+  vl.innerHTML = member.visitHistory.map(v => `
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px">
+      <span>${v.description}</span><span style="color:var(--smoke);font-size:11px">${v.date}</span>
+    </div>`).join('');
+}
+
+// ── ACTIVITY ──
+// ── EVENTS ──
+// ── VOTES ──
+// ── NOTES ──
+function updateNotePreview() {
+  document.getElementById('preview-title').textContent = document.getElementById('note-title').value || 'Your note title';
+  document.getElementById('preview-body').textContent = document.getElementById('note-body').value || 'Your message appears here…';
+}
+
+// ── TERMS ──
+// ── PERKS ──
+// ── MENU ──
+// ── DISH FORM ──
+const MACRO_DB = { 'octopus':{kcal:1.64,p:.30,f:.02,c:.04},'lamb':{kcal:2.94,p:.25,f:.21,c:0},'chicken':{kcal:1.65,p:.31,f:.04,c:0},'beef':{kcal:2.50,p:.26,f:.15,c:0},'salmon':{kcal:2.08,p:.20,f:.13,c:0},'fish':{kcal:1.70,p:.22,f:.08,c:0},'pasta':{kcal:1.31,p:.05,f:.01,c:.25},'rice':{kcal:1.30,p:.03,f:.003,c:.28},'fava':{kcal:1.10,p:.08,f:.004,c:.20},'feta':{kcal:2.64,p:.14,f:.21,c:.04},'yogurt':{kcal:.59,p:.10,f:.004,c:.04},'butter':{kcal:7.17,p:.01,f:.81,c:0},'olive oil':{kcal:8.84,p:0,f:1.00,c:0},'nuts':{kcal:6.07,p:.20,f:.54,c:.21},'pistachio':{kcal:5.60,p:.20,f:.45,c:.28},'honey':{kcal:3.04,p:.003,f:0,c:.82},'dill':{kcal:.43,p:.035,f:.011,c:.07},'lemon':{kcal:.29,p:.011,f:.003,c:.09},'tomato':{kcal:.18,p:.009,f:.002,c:.04} };
+
+function findMacro(name) {
+  const n = name.toLowerCase().trim();
+  if (MACRO_DB[n]) return MACRO_DB[n];
+  for (const key in MACRO_DB) { if (n.includes(key)||key.includes(n)) return MACRO_DB[key]; }
+  return { kcal:1.5,p:.10,f:.07,c:.15 };
+}
+
+function setDishMode(mode) {
+  document.getElementById('mode-ai-btn').classList.toggle('on', mode==='ai');
+  document.getElementById('mode-precise-btn').classList.toggle('on', mode==='precise');
+  document.getElementById('dish-mode-ai').style.display = mode==='ai'?'block':'none';
+  document.getElementById('dish-mode-precise').style.display = mode==='precise'?'block':'none';
+}
+
+function addIngredientRow() {
+  const c = document.getElementById('precise-ingredients');
+  const row = document.createElement('div');
+  row.className = 'ingredient-row';
+  row.innerHTML = `<input type="text" placeholder="Ingredient" oninput="recalculatePrecise()"/><input type="number" placeholder="grams" oninput="recalculatePrecise()"/><button class="remove-btn" onclick="removeIngredient(this)">×</button>`;
+  c.appendChild(row);
+}
+
+function removeIngredient(btn) {
+  const rows = document.querySelectorAll('#precise-ingredients .ingredient-row');
+  if (rows.length > 1) btn.closest('.ingredient-row').remove();
+  else btn.closest('.ingredient-row').querySelectorAll('input').forEach(i=>i.value='');
+  recalculatePrecise();
+}
+
+function recalculatePrecise() {
+  let kcal=0,p=0,f=0,c=0,n=0;
+  document.querySelectorAll('#precise-ingredients .ingredient-row').forEach(row => {
+    const inputs=row.querySelectorAll('input');
+    const name=inputs[0].value.trim(), grams=parseFloat(inputs[1].value);
+    if (name && grams>0) { const m=findMacro(name); kcal+=m.kcal*grams; p+=m.p*grams; f+=m.f*grams; c+=m.c*grams; n++; }
+  });
+  document.getElementById('ingredient-count').textContent=n;
+  document.getElementById('pr-kcal').textContent=Math.round(kcal);
+  document.getElementById('pr-protein').textContent=Math.round(p)+'g';
+  document.getElementById('pr-fat').textContent=Math.round(f)+'g';
+  document.getElementById('pr-carbs').textContent=Math.round(c)+'g';
+}
+
+function estimateAIMacros() {
+  const text=document.getElementById('ai-ingredients').value;
+  const portion=document.getElementById('ai-portion').value;
+  const grams={small:200,medium:280,large:400,shared:550}[portion];
+  const ingredients=text.split(/[,;\n]/).map(i=>i.trim()).filter(i=>i.length>0);
+  if (!ingredients.length) { ['ai-kcal','ai-protein','ai-fat','ai-carbs'].forEach(id=>document.getElementById(id).textContent='—'); return; }
+  let aKcal=0,aP=0,aF=0,aC=0;
+  ingredients.forEach(ing=>{const m=findMacro(ing);aKcal+=m.kcal;aP+=m.p;aF+=m.f;aC+=m.c;});
+  aKcal/=ingredients.length; aP/=ingredients.length; aF/=ingredients.length; aC/=ingredients.length;
+  document.getElementById('ai-kcal').textContent=Math.round(aKcal*grams);
+  document.getElementById('ai-protein').textContent=Math.round(aP*grams)+'g';
+  document.getElementById('ai-fat').textContent=Math.round(aF*grams)+'g';
+  document.getElementById('ai-carbs').textContent=Math.round(aC*grams)+'g';
+}
+
+function resetDishForm() {
+  setDishMode('ai');
+  document.getElementById('dish-name-input').value='';
+  document.getElementById('ai-ingredients').value='';
+  document.querySelectorAll('#precise-ingredients .ingredient-row input').forEach(i=>i.value='');
+  ['ai-kcal','ai-protein','ai-fat','ai-carbs'].forEach(id=>document.getElementById(id).textContent='—');
+  recalculatePrecise();
+}
+
+// ── OVERLAYS ──
+let _savedScrollY = 0;
+function openOverlay(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  _savedScrollY = window.scrollY;
+  el.classList.add('active');
+  document.body.style.top = `-${_savedScrollY}px`;
+  document.body.classList.add('overlay-open');
+  const card = el.querySelector('.overlay-card');
+  if (card) card.scrollTop = 0;
+}
+function closeOverlay(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('active');
+  document.body.classList.remove('overlay-open');
+  document.body.style.top = '';
+  window.scrollTo(0, _savedScrollY);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast').classList.add('show');
+  setTimeout(()=>document.getElementById('toast').classList.remove('show'),2500);
+}
+
+// Wire AI ingredients input to live estimate
+document.addEventListener('DOMContentLoaded',()=>{
+  const el=document.getElementById('ai-ingredients');
+  if (el) el.addEventListener('input',estimateAIMacros);
+});
+</script>
+</body>
+</html>
